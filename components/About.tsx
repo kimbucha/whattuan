@@ -21,7 +21,7 @@ const About: React.FC = () => {
     >
       <SectionHeading>about</SectionHeading>
       <p className='mb-3 lowercase'>
-      hey there , I'm tuan, a fullstack developer. I'm currently a student at the San Francisco State University, studying Computer Science. hit me up if you wanna work on something cool
+      (ﾉ◕ヮ◕)ﾉ*:・ﾟ✧ Hello! I'm Tuan aka Kim, a Fullstack Developer from San Jose, California.  I'm currently a student at the San Francisco State University, studying Computer Science. Message me below if you wanna work on something cool or to say hi! 
       </p>
       <p>
    

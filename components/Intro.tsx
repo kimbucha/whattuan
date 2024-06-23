@@ -19,9 +19,9 @@ const Intro: React.FC = () => {
     <section
       ref={ref}
       id="home"
-      className="mb-28 max-w-[50rem] text-center sm:mb-0 scroll-mt-[100rem]"
+      className="mb-28 max-w-[50rem] text-center sm:mb-0 scroll-mt-[100rem] lowercase"
     >
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center lowercase">
         <div className="relative">
           <motion.div
             initial={{ opacity: 0, scale: 0 }}
