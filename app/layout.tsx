@@ -4,7 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import ActiveSectionContextProvider from "@/context/Active-Section-Context";
 import { Toaster } from "react-hot-toast";
-import Footer from "@/components/footer";
+import Footer from "@/components/Footer";
 import DarkMode from "@/components/Dark-Mode";
 import ThemeContextProvider from "@/context/Theme-Context";
 
