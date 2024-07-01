@@ -23,6 +23,7 @@ export default function Experience() {
         {experiencesData.map((item, index) => (
           <React.Fragment key={index}>
             <VerticalTimelineElement
+            
               visible={true}
               className=" lowercase vertical-timeline-element--work "
               date={experiencesData[index].date}
