@@ -43,7 +43,7 @@ const Header: React.FC = () => {
                 {link.name}
                 {link.name === activeSection && (
                   <motion.span
-                    className="bg-gray-100 rounded-full absolute inset-0 -z-10 dark:bg-neutral-800"
+                    className="bg-gray-100 rounded-full absolute inset-0 -z-10 dark:bg-neutral-800/50"
                     layoutId="activeSection"
                     transition={{
                       type: "spring",
