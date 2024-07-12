@@ -13,7 +13,7 @@ const Header: React.FC = () => {
   return (
     <header className="z-[999] relative lowercase">
       <motion.div
-        className="fixed top-0 left-1/2 transform -translate-x-1/2 h-[5rem] w-full sm:top-6 sm:h-[3.25rem] sm:w-[36rem] sm:rounded-full rounded-none border border-white border-opacity-40 bg-white bg-opacity-80 shadow-lg shadow-black/[.03] backdrop-blur-[.5rem] dark:bg-gray-900 dark:border-opacity-40 dark:shadow-black/[.04] dark:bg-opacity-80 dark:backdrop-blur-[.5rem] dark:border-black/40"
+        className="fixed top-0 left-1/2 transform -translate-x-1/2 h-[5rem] w-full sm:top-6 sm:h-[3.25rem] sm:w-[36rem] sm:rounded-full rounded-none border border-white border-opacity-40 bg-white bg-opacity-80 shadow-lg shadow-black/[.03] backdrop-blur-[.5rem] dark:border-opacity-40 dark:shadow-black/[.04] dark:bg-opacity-80 dark:backdrop-blur-[.5rem] dark:bg-white/10 dark:text-white/60 dark:hover:text-white/90 dark:border-white/20"
         initial={{ y: -100, x: "-50%", opacity: 0 }}
         animate={{ y: 0, x: "-50%", opacity: 1 }}
       ></motion.div>
@@ -43,7 +43,7 @@ const Header: React.FC = () => {
                 {link.name}
                 {link.name === activeSection && (
                   <motion.span
-                    className="bg-gray-100 rounded-full absolute inset-0 -z-10 dark:bg-gray-800"
+                    className="bg-gray-100 rounded-full absolute inset-0 -z-10 dark:bg-neutral-800"
                     layoutId="activeSection"
                     transition={{
                       type: "spring",

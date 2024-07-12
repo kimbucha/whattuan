@@ -73,7 +73,7 @@ const Intro: React.FC = () => {
       >
         <Link
           href="#contact"
-          className="group bg-gray-900 text-gray-200 px-7 py-3 flex items-center gap-2 rounded-full outline-none focus:scale-110 hover:scale-110 active:scale-105 hover:bg-gray-950 hover:text-white transition borderBlack dark:bg-slate-800 dark:text-white/60 dark:hover:text-white/90 dark:border-white/20 "
+          className="group bg-gray-900 text-gray-200 px-7 py-3 flex items-center gap-2 rounded-full outline-none focus:scale-110 hover:scale-110 active:scale-105 hover:bg-gray-950 hover:text-white transition borderBlack dark:bg-neutral-800 dark:text-white/60 dark:hover:text-white/90 dark:border-white/20 "
           onClick={() => {
             setActiveSection("Contact");
             setTimeOfLastClick(Date.now());

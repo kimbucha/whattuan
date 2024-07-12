@@ -8,9 +8,11 @@ import { useSectionInView } from '@/lib/hooks';
 
 
 const Projects: React.FC = () => {
-  const {ref} = useSectionInView('Stuff', .5);
+  // const {ref} = useSectionInView('Stuff', .5);           apply when live
   return (
-    <section ref={ref} id="projects" className="scroll-mt-28">
+    <section 
+    // ref={ref}                                            apply when live       
+    id="projects" className="scroll-mt-28">
       <SectionHeading>stuff</SectionHeading>
       <div>
         {

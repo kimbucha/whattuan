@@ -13,11 +13,13 @@ import { useTheme } from "@/context/Theme-Context";
 import Image from "next/image";
 
 export default function Experience() {
-  const { ref } = useSectionInView("Exp", 0.5,);
+  // const { ref } = useSectionInView("Exp", 0.5,);                     apply when live
   const { theme } = useTheme();
 
   return (
-    <section id="experience" ref={ref} className="scroll-mt-28 mb-28 sm:mb-40 ">
+    <section id="experience" 
+    // ref={ref}                                                        apply when live
+    className="scroll-mt-28 mb-28 sm:mb-40 ">
       <SectionHeading>exp</SectionHeading>
       <VerticalTimeline>
         {experiencesData.map((item, index) => (
