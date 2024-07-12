@@ -7,8 +7,23 @@ import { Toaster } from "react-hot-toast";
 import Footer from "@/components/Footer";
 import DarkMode from "@/components/Dark-Mode";
 import ThemeContextProvider from "@/context/Theme-Context";
+import localFont from '@next/font/local'
 
+const erotique = localFont({
+  src: [
+    {
+      path: '../public/erotique/ErotiqueAlternateTrial-Regular.ttf',
+      weight: '400'
+    },
+    {
+      path: '../public/erotique/ErotiqueAlternateTrial-Bold.ttf',
+      weight: '700'
+    }
+  ],
+  variable: '--font-erotique'
+})
 const inter = Inter({ subsets: ["latin"] });
+
 
 export const metadata: Metadata = {
   title: "whattuan",
@@ -23,7 +38,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="!scroll-smooth">
       <body
-        className={`${inter.className} bg-gray-50 text-gray-950 relative pt-28 sm:pt-36 dark:bg-gray-900 dark:text-gray-50 dark:text-opacity-90 transition-colors duration-500`}
+        className={`${inter.className}   bg-gray-50 text-gray-950 relative pt-28 sm:pt-36 dark:bg-gray-900 dark:text-gray-50 dark:text-opacity-90 `}
       >
         <ThemeContextProvider>
           <ActiveSectionContextProvider>

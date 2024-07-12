@@ -20,18 +20,18 @@ export const links = [
     name: "About",
     hash: "#about",
   },
-  {
-    name: "Projects",
-    hash: "#projects",
-  },
-  {
-    name: "Skills",
-    hash: "#skills",
-  },
-  {
-    name: "Experience",
-    hash: "#experience",
-  },
+  // {
+  //   name: "Stuff",
+  //   hash: "#projects",
+  // },
+  // {
+  //   name: "Skills",
+  //   hash: "#skills",
+  // },
+  // {
+  //   name: "Exp",
+  //   hash: "#experience",
+  // },
   {
     name: "Contact",
     hash: "#contact",
@@ -70,7 +70,7 @@ export const experiencesData = [
   },
 
   {
-    title: "Automated Floor Manager | Learning Ambassador | Associate | Driver" ,
+    title: "Automated Floor Manager | Learning Ambassador | Driver" ,
     company: "Amazon ",
     location: "Troutdale, OR",
     description:

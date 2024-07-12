@@ -8,10 +8,10 @@ import { useSectionInView } from '@/lib/hooks';
 
 
 const Projects: React.FC = () => {
-  const {ref} = useSectionInView('Projects', .5);
+  const {ref} = useSectionInView('Stuff', .5);
   return (
     <section ref={ref} id="projects" className="scroll-mt-28">
-      <SectionHeading>Projects</SectionHeading>
+      <SectionHeading>stuff</SectionHeading>
       <div>
         {
           projectsData.map((project, index) => (

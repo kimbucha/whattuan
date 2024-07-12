@@ -19,9 +19,9 @@ const About: React.FC = () => {
     transition={{delay: .175}}
     id='about'
     >
-      <SectionHeading>about</SectionHeading>
+      <SectionHeading>soo</SectionHeading>
       <p className='mb-3 lowercase'>
-      (ﾉ◕ヮ◕)ﾉ*:・ﾟ✧ Hello! I'm Tuan aka Kim, from San Jose, California.  I'm currently a student at the San Francisco State University, studying Computer Science. Message me below if you wanna work on something cool or to say hi! 
+      stuff incoming. stay tuned.
       </p>
       <p>
    

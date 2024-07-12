@@ -22,9 +22,9 @@ const Contact: React.FC = () => {
       transition={{ duration: 1 }}
       viewport={{ once: true }}
     >
-      <SectionHeading>contact</SectionHeading>
+      <SectionHeading>hmu</SectionHeading>
       <p className="text-gray-700 -mt-3 dark:text-white">
-        message me about anything at{" "}
+        @{" "}
         <a className="underline" href="mailto:kim.nguyen.afk@gmail.com">
           kim.nguyen.afk@gmail.com
         </a>{" "}

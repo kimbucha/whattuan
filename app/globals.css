@@ -4,6 +4,8 @@
 @tailwind components;
 @tailwind utilities;
 
+
+
 html {
   --line-color: #e5e7eb;
 }
@@ -13,3 +15,6 @@ html.dark{
 .borderBlack{
   @apply border border-black/10
 }
+
+
+

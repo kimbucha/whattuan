@@ -13,7 +13,7 @@ import { useTheme } from "@/context/Theme-Context";
 import Image from "next/image";
 
 export default function Experience() {
-  const { ref } = useSectionInView("Experience");
+  const { ref } = useSectionInView("Exp", 0.5,);
   const { theme } = useTheme();
 
   return (

@@ -60,7 +60,7 @@ const Intro: React.FC = () => {
         initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <span className="font-bold">what</span>
+        <span className="">what</span>
       </motion.h1>
 
       <motion.div
@@ -73,13 +73,13 @@ const Intro: React.FC = () => {
       >
         <Link
           href="#contact"
-          className="group bg-gray-900 text-gray-200 px-7 py-3 flex items-center gap-2 rounded-full outline-none focus:scale-110 hover:scale-110 active:scale-105 hover:bg-gray-950 hover:text-white  transition"
+          className="group bg-gray-900 text-gray-200 px-7 py-3 flex items-center gap-2 rounded-full outline-none focus:scale-110 hover:scale-110 active:scale-105 hover:bg-gray-950 hover:text-white transition borderBlack dark:bg-slate-800 dark:text-white/60 dark:hover:text-white/90 dark:border-white/20 "
           onClick={() => {
             setActiveSection("Contact");
             setTimeOfLastClick(Date.now());
           }}
         >
-          Contact me here
+          Contact
           <BsArrowRight className="opacity-70 group-hover:translate-x-1.5 transition" />
         </Link>
 
