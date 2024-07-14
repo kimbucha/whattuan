@@ -21,7 +21,7 @@ const About: React.FC = () => {
     >
       <SectionHeading>soo</SectionHeading>
       <p className='mb-3 lowercase'>
-      stuff incoming. stay tuned.
+      stuff inbound. stay tuned.
       </p>
       <p>
    

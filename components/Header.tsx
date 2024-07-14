@@ -19,6 +19,7 @@ const Header: React.FC = () => {
         animate={{ y: 0, x: "-50%", opacity: 1 }}
       ></motion.div>
       <nav className="fixed top-[.15rem] left-1/2 transform -translate-x-1/2  h-12 sm:top-[1.7rem] sm:h-auto flex justify-center w-full py-2 sm:py-0">
+        
         <ul className="flex w-full max-w-[22rem] sm:max-w-none sm:w-auto flex-wrap sm:flex-nowrap items-center justify-center gap-y-1 text-[.9rem] font-medium text-gray-500 sm:gap-5 transform translate-x-7">
           {links.map((link) => (
             <motion.li
@@ -43,7 +44,6 @@ const Header: React.FC = () => {
               >
                 {link.name}
                 {link.name === activeSection && (
-                  
                   <motion.span
                     className="bg-gray-100 rounded-sm absolute h-1.5 inset-0 -z-10 dark:bg-neutral-800/50"
                     layoutId="activeSection"
@@ -52,34 +52,26 @@ const Header: React.FC = () => {
                       stiffness: 380,
                       damping: 30,
                     }}
-                  >
-                    
-
-                  </motion.span>
-                  
+                  ></motion.span>
                 )}
               </Link>
               
             </motion.li>
             
-          )
-          )}
+          ))}
+
         </ul>
         <motion.span
-                    className=""
-
-                    transition={{
-                      type: "spring",
-                      stiffness: 380,
-                      damping: 30,
-                    }}
-                  >
-                    
-                    <DarkMode />
-                  </motion.span>
-        
+          className=""
+          transition={{
+            type: "spring",
+            stiffness: 380,
+            damping: 30,
+          }}
+        >
+          <DarkMode />
+        </motion.span>
       </nav>
-      
     </header>
   );
 };
