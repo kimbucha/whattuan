@@ -1,17 +1,29 @@
-import React from 'react';
-import {Html, Body, Head, Heading, Hr, Container, Preview, Section, Text} from '@react-email/components'
-import { Tailwind } from '@react-email/tailwind'
-
+import React from "react";
+import {
+  Html,
+  Body,
+  Head,
+  Heading,
+  Hr,
+  Container,
+  Preview,
+  Section,
+  Text,
+} from "@react-email/components";
+import { Tailwind } from "@react-email/tailwind";
 
 type ContactFormEmailProps = {
   message: string;
-  senderEmail: string
+  senderEmail: string;
 };
 
-export default function ContactFormEmail({message, senderEmail}: ContactFormEmailProps) {
+export default function ContactFormEmail({
+  message,
+  senderEmail,
+}: ContactFormEmailProps) {
   return (
     <Html>
-      <Head/>
+      <Head />
       <Preview>what new message</Preview>
       <Tailwind>
         <Body className="bg-gray-100">
@@ -21,7 +33,7 @@ export default function ContactFormEmail({message, senderEmail}: ContactFormEmai
                 hey u got a new message
               </Heading>
               <Text>{message}</Text>
-              <Hr/>
+              <Hr />
               <Text>sender: {senderEmail}</Text>
             </Section>
           </Container>
@@ -29,5 +41,4 @@ export default function ContactFormEmail({message, senderEmail}: ContactFormEmai
       </Tailwind>
     </Html>
   );
-};
-
+}

@@ -8,37 +8,34 @@ import { Toaster } from "react-hot-toast";
 import Footer from "@/components/Footer";
 
 import ThemeContextProvider from "@/context/Theme-Context";
-import localFont from '@next/font/local'
+import localFont from "@next/font/local";
 import Lines from "@/components/Lines";
 
 const erotique = localFont({
   src: [
     {
-      path: '../public/erotique/ErotiqueAlternateTrial-Regular.ttf',
-      weight: '400'
+      path: "../public/erotique/ErotiqueAlternateTrial-Regular.ttf",
+      weight: "400",
     },
     {
-      path: '../public/erotique/ErotiqueAlternateTrial-Bold.ttf',
-      weight: '700'
-    }
+      path: "../public/erotique/ErotiqueAlternateTrial-Bold.ttf",
+      weight: "700",
+    },
   ],
-  variable: '--font-erotique'
-})
+  variable: "--font-erotique",
+});
 
 const tiny5 = localFont({
   src: [
     {
-      path: '../public/Tiny5/Tiny5-Regular.ttf',
-      weight: '400'
-    }
+      path: "../public/Tiny5/Tiny5-Regular.ttf",
+      weight: "400",
+    },
   ],
-  variable: '--font-tiny5'
-})
-
-
+  variable: "--font-tiny5",
+});
 
 const inter = Inter({ subsets: ["latin"] });
-
 
 export const metadata: Metadata = {
   title: "whattuan",
@@ -57,13 +54,12 @@ export default function RootLayout({
       >
         <ThemeContextProvider>
           <ActiveSectionContextProvider>
-            <Header/>
+            <Header />
             {children}
             <Toaster position="bottom-center" reverseOrder={false} />
             <Footer />
             {/* <Lines /> */}
           </ActiveSectionContextProvider>
-
         </ThemeContextProvider>
       </body>
     </html>

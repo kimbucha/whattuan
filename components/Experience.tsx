@@ -17,15 +17,16 @@ export default function Experience() {
   const { theme } = useTheme();
 
   return (
-    <section id="experience" 
-    // ref={ref}                                                        apply when live
-    className="scroll-mt-28 mb-28 sm:mb-40 ">
+    <section
+      id="experience"
+      // ref={ref}                                                        apply when live
+      className="scroll-mt-28 mb-28 sm:mb-40 "
+    >
       <SectionHeading>exp</SectionHeading>
       <VerticalTimeline>
         {experiencesData.map((item, index) => (
           <React.Fragment key={index}>
             <VerticalTimelineElement
-            
               visible={true}
               className=" lowercase vertical-timeline-element--work "
               date={experiencesData[index].date}
