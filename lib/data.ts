@@ -65,7 +65,7 @@ export const experiencesData = [
     location: "San Jose, CA",
     description: "improved the guest experience and the teamwork fluidity.",
     icon: goku,
-    date: "Aug 2018 - present",
+    date: "Aug 2018 - Apr 2022",
   },
 
   {
