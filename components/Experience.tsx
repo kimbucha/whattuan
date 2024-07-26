@@ -44,7 +44,7 @@ export default function Experience() {
                     ? ".4rem solid #9ca3af"
                     : ".4rem solid rgba(255,255,255,.5)",
               }}
-              icon={<Image src={item.icon} alt={""} className="m-auto mt-3" />}
+              icon={<Image src={item.icon} alt={"tuan nguyen"} className="m-auto mt-3" />}
               iconStyle={{
                 background:
                   theme == "light" ? "#f3f4f6" : "rgba(255,255,255,.05",

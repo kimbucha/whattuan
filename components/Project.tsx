@@ -47,7 +47,7 @@ function Project({ title, description, tags, imageUrl }: ProjectProps) {
 
         <Image
           src={imageUrl}
-          alt="Projects"
+          alt="tuan nguyen"
           quality={95}
           className="absolute hidden sm:block top-8 -right-40 w-[28.25rem] rounded-t-lg shadow-2xl 
             group-hover:scale-[1.04]
