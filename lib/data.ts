@@ -7,6 +7,7 @@ import buca from "@/public/buca.png";
 import amazon from "@/public/amazon.png";
 import onepot from "@/public/onepot.png";
 import sifted from "@/public/sifted.png";
+import tablepot from "@/public/tablepot.webp";
 
 export const links = [
   {
@@ -14,21 +15,9 @@ export const links = [
     hash: "#home",
   },
   {
-    name: "About",
-    hash: "#about",
+    name: "Stuff",
+    hash: "#projects",
   },
-  // {
-  //   name: "Stuff",
-  //   hash: "#projects",
-  // },
-  // {
-  //   name: "Skills",
-  //   hash: "#skills",
-  // },
-  // {
-  //   name: "Exp",
-  //   hash: "#experience",
-  // },
   {
     name: "Contact",
     hash: "#contact",
@@ -107,27 +96,12 @@ export const experiencesData = [
 
 export const projectsData = [
   {
-    supersecretproject: "applehireme",
-    supersecretdescription: "a wish imessages was like this",
-    title: "project 1",
-    description:
-      "bro ipsum dolor sit amet gaper backside single track, epic clipless. drop gondy, clipless rip bowl couloir bomb hole. cruiser crank endo, sucker hole piste ripping ACL flow face plant pinner.",
-    tags: ["tag.A", "tag.B", "tag.C", "tag.d", "tag.e"],
-    imageUrl: doge,
-  },
-  {
-    title: "project 2",
-    description:
-      "Chase ball of string eat plants, meow, and throw up because  ate plants going to catch the red dot today steal the warm chair right after you get up.",
-    tags: ["tag.A", "tag.B", "tag.C", "tag.d", "tag.e"],
-    imageUrl: spongebob,
-  },
-  {
-    title: "project 3",
-    description:
-      "Yolo ipsum dolor sit amet, consectetur adipiscing elit. Ut ac suscipit leo. Carpe diem vulputate est nec commodo rutrum. .",
-    tags: ["tag.A", "tag.B", "tag.C", "tag.d", "tag.e"],
-    imageUrl: harambe,
+    title: "Table Pots: 70x",
+    description: "Developed an interactive web application designed to celebrate a 7-month anniversary with 70 meaningful questions.",
+    tags: ["Next.js", "React", "Typescript", "Tailwind CSS", "Git", "Vercel"],
+    imageUrl: "/tablepot.webp",
+    imageWidth: 900, // Adjusted width
+    imageHeight: 700, // Adjusted height
   },
 ] as const;
 

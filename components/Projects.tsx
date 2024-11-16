@@ -1,25 +1,17 @@
 "use client";
 
 import React from "react";
-import SectionHeading from "./Section-Heading";
 import { projectsData } from "@/lib/data";
 import Project from "./Project";
-import { useSectionInView } from "@/lib/hooks";
+import SectionHeading from "./Section-Heading";
 
 const Projects: React.FC = () => {
-  // const {ref} = useSectionInView('Stuff', .5);           apply when live
   return (
-    <section
-      // ref={ref}                                            apply when live
-      id="projects"
-      className="scroll-mt-28"
-    >
-      <SectionHeading>stuff</SectionHeading>
-      <div>
+    <section id="projects" className="flex flex-col items-center justify-center min-h-screen mb-20 sm:mb-28 w-full text-center">
+      <SectionHeading>Projects</SectionHeading>
+      <div className="flex flex-col items-center gap-6 mt-10">
         {projectsData.map((project, index) => (
-          <React.Fragment key={index}>
-            <Project {...project} />
-          </React.Fragment>
+          <Project key={index} {...project} />
         ))}
       </div>
     </section>

@@ -9,23 +9,11 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-erotique)"],
+        'times': ['Times New Roman', 'serif'],
       },
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-      },
-      scale: {
-        '25': '0.25',  // Scale to 25%
-        '30': '0.30',  // Scale to 30%
-        '35': '0.35',  // Scale to 35%
-        '40': '0.40',  // Scale to 40%
-        '45': '0.45',  // Scale to 45%
-      }
     },
   },
   plugins: [],
-  darkMode: "class",
 };
+
 export default config;

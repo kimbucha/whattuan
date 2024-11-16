@@ -1,0 +1,22 @@
+.project-card {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+  transition: transform 0.3s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-10px);
+}
+
+/* Add any necessary global styles here */
+
+/* Ensure the project image is correctly positioned */
+.project-image {
+  position: relative;
+  margin-left: 1rem;
+}
+
+/* Remove the project image styles */
