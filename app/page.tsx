@@ -1,38 +1,42 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { PhotoIcon } from "@heroicons/react/24/outline";
 import gsap from "gsap";
+import ImageIcon from "@/components/ImageIcon";
 
 export default function Home() {
-  const iconRef = useRef(null);
+  const iconContainerRef = useRef(null);
+  const timeoutRef = useRef<NodeJS.Timeout>();
   
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Initial state - hidden and at the position of "what"
-      gsap.set(iconRef.current, {
+      gsap.set(iconContainerRef.current, {
         y: 0,
         opacity: 0,
         scale: 0.8,
       });
     });
 
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
   }, []);
 
-  const handleHover = () => {
-    gsap.to(iconRef.current, {
-      y: 100, // Distance to slide down
+  const slideOut = () => {
+    gsap.to(iconContainerRef.current, {
+      y: 100,
       opacity: 1,
       scale: 1,
       duration: 1,
-      ease: "elastic.out(1, 0.5)", // Bouncy effect
-      yoyo: true,
+      ease: "elastic.out(1, 0.5)",
     });
   };
 
-  const handleHoverExit = () => {
-    gsap.to(iconRef.current, {
+  const slideIn = () => {
+    gsap.to(iconContainerRef.current, {
       y: 0,
       opacity: 0,
       scale: 0.8,
@@ -41,21 +45,32 @@ export default function Home() {
     });
   };
 
+  const handleHover = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    
+    slideOut();
+    
+    timeoutRef.current = setTimeout(() => {
+      slideIn();
+    }, 4200);
+  };
+
   return (
     <main className="flex min-h-screen items-center justify-center">
       <div className="relative">
         <h1 
           className="font-times text-white text-4xl cursor-pointer"
           onMouseEnter={handleHover}
-          onMouseLeave={handleHoverExit}
         >
           what
         </h1>
         <div 
-          ref={iconRef}
+          ref={iconContainerRef}
           className="absolute left-1/2 -translate-x-1/2 mt-4 pointer-events-none"
         >
-          <PhotoIcon className="h-8 w-8 text-white" />
+          <ImageIcon />
         </div>
       </div>
     </main>
