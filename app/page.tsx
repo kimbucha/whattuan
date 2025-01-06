@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import ImageIcon from "@/components/ImageIcon";
+import "@/lib/gsap";
 
 export default function Home() {
   const iconContainerRef = useRef(null);
   const timeoutRef = useRef<NodeJS.Timeout>();
+  const [isIconVisible, setIsIconVisible] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
   
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -32,10 +35,12 @@ export default function Home() {
       scale: 1,
       duration: 1,
       ease: "elastic.out(1, 0.5)",
+      onComplete: () => setIsIconVisible(true),
     });
   };
 
   const slideIn = () => {
+    setIsIconVisible(false);
     gsap.to(iconContainerRef.current, {
       y: 0,
       opacity: 0,
@@ -45,16 +50,24 @@ export default function Home() {
     });
   };
 
-  const handleHover = () => {
+  const handleMouseEnter = () => {
+    setIsHovering(true);
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    
-    slideOut();
-    
+    if (!isIconVisible) {
+      slideOut();
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovering(false);
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
     timeoutRef.current = setTimeout(() => {
       slideIn();
-    }, 4200);
+    }, 3000); // 3 seconds delay
   };
 
   return (
@@ -62,15 +75,18 @@ export default function Home() {
       <div className="relative">
         <h1 
           className="font-times text-white text-4xl cursor-pointer"
-          onMouseEnter={handleHover}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
         >
           what
         </h1>
         <div 
           ref={iconContainerRef}
-          className="absolute left-1/2 -translate-x-1/2 mt-4 pointer-events-none"
+          className="absolute left-1/2 -translate-x-1/2 mt-4"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
         >
-          <ImageIcon />
+          <ImageIcon isVisible={isIconVisible} />
         </div>
       </div>
     </main>
