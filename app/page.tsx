@@ -15,17 +15,11 @@ export default function Home() {
 
   useEffect(() => {
     // Initial setup - position icons at their starting points
-    gsap.set(imageIconRef.current, {
+    gsap.set([imageIconRef.current, githubIconRef.current], {
       opacity: 0,
+      scale: 0.8,
       y: 0,
-      scale: 0.8
-    });
-    
-    gsap.set(githubIconRef.current, {
-      opacity: 0,
-      x: 0,
-      y: 0,
-      scale: 0.8
+      x: 0
     });
 
     return () => {
@@ -40,26 +34,32 @@ export default function Home() {
       clearTimeout(timeoutRef.current);
     }
 
-    // Show image icon sliding down
-    gsap.to(imageIconRef.current, {
-      opacity: 1,
-      y: 100,
-      scale: 1,
-      duration: 0.5,
-      ease: "back.out(1.7)",
-      onComplete: () => setIsImageIconVisible(true)
+    // Create a timeline for synchronized animations
+    const tl = gsap.timeline({
+      onComplete: () => {
+        setIsImageIconVisible(true);
+        setIsGithubIconVisible(true);
+      }
     });
 
-    // Show github icon sliding diagonally
-    gsap.to(githubIconRef.current, {
+    // Add both animations to the timeline
+    tl.to([imageIconRef.current, githubIconRef.current], {
       opacity: 1,
-      x: -100,
-      y: -100,
       scale: 1,
+      duration: 0.3,
+      ease: "back.out(1.7)",
+    }, 0) // Start at the same time
+    .to(imageIconRef.current, {
+      y: 100,
       duration: 0.5,
       ease: "back.out(1.7)",
-      onComplete: () => setIsGithubIconVisible(true)
-    });
+    }, 0) // Start at the same time
+    .to(githubIconRef.current, {
+      x: -100,
+      y: -100,
+      duration: 0.5,
+      ease: "back.out(1.7)",
+    }, 0); // Start at the same time
   };
 
   const handleMouseLeave = () => {
@@ -74,23 +74,27 @@ export default function Home() {
       setIsImageIconVisible(false);
       setIsGithubIconVisible(false);
 
-      // Hide both icons with a slide back
-      gsap.to(imageIconRef.current, {
+      // Create a timeline for synchronized hiding
+      const tl = gsap.timeline();
+
+      // Add both hide animations to the timeline
+      tl.to([imageIconRef.current, githubIconRef.current], {
         opacity: 0,
-        y: 0,
         scale: 0.8,
         duration: 0.3,
-        ease: "power2.inOut"
-      });
-
-      gsap.to(githubIconRef.current, {
-        opacity: 0,
+        ease: "power2.inOut",
+      }, 0) // Start at the same time
+      .to(imageIconRef.current, {
+        y: 0,
+        duration: 0.3,
+        ease: "power2.inOut",
+      }, 0) // Start at the same time
+      .to(githubIconRef.current, {
         x: 0,
         y: 0,
-        scale: 0.8,
         duration: 0.3,
-        ease: "power2.inOut"
-      });
+        ease: "power2.inOut",
+      }, 0); // Start at the same time
     }, 3000);
   };
 
@@ -131,3 +135,4 @@ export default function Home() {
     </main>
   );
 }
+
