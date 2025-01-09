@@ -51,10 +51,6 @@ const ActivityChart: React.FC<ActivityChartProps> = ({
     return `${count} contribution${count !== 1 ? 's' : ''} on ${formatDate(date)}`;
   };
 
-  const handleSquareClick = () => {
-    window.open('https://github.com/kimbucha', '_blank');
-  };
-
   // Calculate responsive sizes based on container width
   const squareSize = 10;
   const gap = 2;
@@ -95,7 +91,7 @@ const ActivityChart: React.FC<ActivityChartProps> = ({
               {week.map((day, dayIndex) => (
                 <div
                   key={`${weekIndex}-${dayIndex}`}
-                  className="transition-colors duration-200 cursor-pointer"
+                  className="transition-colors duration-200 cursor-pointer hover:ring-1 hover:ring-[#7d8590] hover:ring-offset-1 hover:ring-offset-[#161b22]"
                   style={{
                     width: squareSize,
                     height: squareSize,
@@ -109,7 +105,8 @@ const ActivityChart: React.FC<ActivityChartProps> = ({
                   title={getTooltipText(day.date, day.count)}
                   role="gridcell"
                   aria-label={getTooltipText(day.date, day.count)}
-                  onClick={handleSquareClick}
+                  data-date={day.date}
+                  data-count={day.count}
                 />
               ))}
             </div>
