@@ -16,11 +16,13 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
   onChartClose 
 }) => {
   const [showChart, setShowChart] = useState(false);
-  const [contributionData] = useState<ActivityData[]>([
+  const [contributionData, setContributionData] = useState<ActivityData[]>([
     { date: '2025-01-01', count: 2 },
     { date: '2025-01-02', count: 2 },
-    { date: '2025-01-05', count: 1 }
+    { date: '2025-01-07', count: 1 },
+    { date: '2025-01-08', count: 1 }
   ]);
+  const [isLoading, setIsLoading] = useState(false);
   
   const containerRef = useRef<HTMLDivElement>(null);
   const iconRef = useRef<SVGSVGElement>(null);
@@ -28,18 +30,71 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
   const pathRef = useRef<SVGPathElement>(null);
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
+  // Fetch GitHub contributions
+  const fetchContributions = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('https://api.github.com/users/kimbucha/events');
+      const events = await response.json();
+      
+      const contributions = new Map<string, number>();
+      events.forEach((event: any) => {
+        // Count all contribution types
+        if ([
+          'PushEvent',
+          'CreateEvent',
+          'PullRequestEvent',
+          'IssuesEvent',
+          'CommitCommentEvent',
+          'PullRequestReviewEvent'
+        ].includes(event.type)) {
+          const date = event.created_at.split('T')[0];
+          let count = 1; // Default count for most events
+          
+          // For push events, count the commits
+          if (event.type === 'PushEvent') {
+            count = event.payload.commits?.length || 1;
+          }
+          
+          contributions.set(date, (contributions.get(date) || 0) + count);
+        }
+      });
+
+      const newData = Array.from(contributions.entries())
+        .map(([date, count]) => ({ date, count }))
+        .filter(d => d.date.startsWith('2025'))
+        .sort((a, b) => a.date.localeCompare(b.date)); // Sort by date
+
+      if (newData.length > 0) {
+        setContributionData(newData);
+      }
+    } catch (error) {
+      console.error('Failed to fetch contributions:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Setup breathing animation
   useEffect(() => {
-    if (isVisible && containerRef.current) {
-      createBreathingAnimation(containerRef.current);
+    if (isVisible && containerRef.current && iconRef.current && circleRef.current && pathRef.current) {
+      createBreathingAnimation({
+        container: containerRef.current,
+        icon: iconRef.current,
+        elements: [circleRef.current, pathRef.current],
+        isVisible
+      });
     }
   }, [isVisible]);
 
-  const handleClick = useCallback((e?: React.MouseEvent | React.KeyboardEvent) => {
+  // Handle icon click
+  const handleClick = useCallback(async (e?: React.MouseEvent | React.KeyboardEvent) => {
     if (e?.stopPropagation) {
       e.stopPropagation();
     }
 
     if (!showChart) {
+      // Click animation
       gsap.to(iconRef.current, {
         scale: 0.9,
         duration: 0.1,
@@ -47,6 +102,8 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
         repeat: 1
       });
 
+      // Fetch and show chart
+      fetchContributions();
       gsap.fromTo(chartContainerRef.current,
         { opacity: 0, scale: 0.95, y: 20 },
         {
@@ -64,7 +121,7 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
     } else {
       closeChart();
     }
-  }, [showChart, onChartOpen]);
+  }, [showChart, onChartOpen, fetchContributions]);
 
   const closeChart = useCallback(() => {
     gsap.to(chartContainerRef.current, {
@@ -88,11 +145,6 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
       closeChart();
     }
   }, [handleClick, showChart, closeChart]);
-
-  const handleBackdropClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    closeChart();
-  }, [closeChart]);
 
   return (
     <div 
@@ -134,7 +186,7 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
         <>
           <div 
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-            onClick={handleBackdropClick}
+            onClick={closeChart}
             aria-hidden="true"
           />
           <div 
@@ -146,23 +198,29 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="bg-[#161b22] rounded-lg shadow-xl p-4">
-              <ActivityChart 
-                data={contributionData}
-                colorScheme={{
-                  empty: '#161b22',
-                  levels: [
-                    '#0e4429',
-                    '#006d32',
-                    '#26a641',
-                    '#39d353'
-                  ]
-                }}
-                animation={{
-                  enabled: true,
-                  duration: 0.3,
-                  stagger: 0.01
-                }}
-              />
+              {isLoading ? (
+                <div className="flex items-center justify-center h-[128px] text-[#7d8590] text-sm">
+                  Loading contributions...
+                </div>
+              ) : (
+                <ActivityChart 
+                  data={contributionData}
+                  colorScheme={{
+                    empty: '#161b22',
+                    levels: [
+                      '#0e4429',
+                      '#006d32',
+                      '#26a641',
+                      '#39d353'
+                    ]
+                  }}
+                  animation={{
+                    enabled: true,
+                    duration: 0.3,
+                    stagger: 0.01
+                  }}
+                />
+              )}
             </div>
           </div>
         </>

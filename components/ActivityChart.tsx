@@ -18,7 +18,7 @@ const ActivityChart: React.FC<ActivityChartProps> = ({
   const maxCount = getMaxCount(filledData);
   const weeks = generateWeeksArray(filledData);
 
-  // All days for the grid, but only label odd days
+  // Days of week in order, showing only Mon/Wed/Fri
   const daysOfWeek = [
     { day: 'Sun', show: false },
     { day: 'Mon', show: true },
@@ -51,16 +51,11 @@ const ActivityChart: React.FC<ActivityChartProps> = ({
     return `${count} contribution${count !== 1 ? 's' : ''} on ${formatDate(date)}`;
   };
 
-  // Calculate responsive sizes based on container width
-  const squareSize = 10;
-  const gap = 2;
-  const labelWidth = 30;
-
   return (
     <div className="text-sm w-full max-w-[800px]">
       {/* Month labels */}
       <div className="flex mb-2">
-        <div style={{ width: labelWidth }} /> {/* Spacer for day labels */}
+        <div className="w-8" /> {/* Spacer for day labels */}
         <div className="flex-1 flex text-[#7d8590] text-xs">
           <div className="w-[10px]">Jan</div>
         </div>
@@ -68,16 +63,12 @@ const ActivityChart: React.FC<ActivityChartProps> = ({
 
       <div className="flex">
         {/* Day labels */}
-        <div className="flex flex-col mr-2 text-[#7d8590]" style={{ width: labelWidth }}>
+        <div className="flex flex-col mr-2 text-[#7d8590]">
           {daysOfWeek.map(({ day, show }) => (
             <div 
               key={day} 
-              className="text-[10px] leading-[10px]"
-              style={{ 
-                height: squareSize,
-                marginBottom: gap,
-                visibility: show ? 'visible' : 'hidden'
-              }}
+              className="h-[10px] text-[10px] leading-[10px] mb-[2px]"
+              style={{ visibility: show ? 'visible' : 'hidden' }}
             >
               {day}
             </div>
@@ -91,22 +82,17 @@ const ActivityChart: React.FC<ActivityChartProps> = ({
               {week.map((day, dayIndex) => (
                 <div
                   key={`${weekIndex}-${dayIndex}`}
-                  className="transition-colors duration-200 cursor-pointer hover:ring-1 hover:ring-[#7d8590] hover:ring-offset-1 hover:ring-offset-[#161b22]"
+                  className="w-[10px] h-[10px] rounded-sm transition-colors duration-200 hover:ring-1 hover:ring-[#7d8590] hover:ring-offset-1 hover:ring-offset-[#161b22]"
                   style={{
-                    width: squareSize,
-                    height: squareSize,
                     backgroundColor: getColor(day.count),
                     opacity: animation.enabled ? 0 : 1,
                     animation: animation.enabled 
                       ? `fadeIn ${animation.duration}s ease-out forwards ${weekIndex * (animation.stagger ?? 0.01)}s`
-                      : undefined,
-                    borderRadius: 2
+                      : undefined
                   }}
                   title={getTooltipText(day.date, day.count)}
                   role="gridcell"
                   aria-label={getTooltipText(day.date, day.count)}
-                  data-date={day.date}
-                  data-count={day.count}
                 />
               ))}
             </div>
@@ -120,12 +106,8 @@ const ActivityChart: React.FC<ActivityChartProps> = ({
         {[colorScheme.empty, ...colorScheme.levels].map((color, i) => (
           <div
             key={i}
-            className="mx-[1px] rounded-sm"
-            style={{ 
-              width: squareSize,
-              height: squareSize,
-              backgroundColor: color 
-            }}
+            className="w-[10px] h-[10px] rounded-sm mx-[1px]"
+            style={{ backgroundColor: color }}
             role="presentation"
           />
         ))}

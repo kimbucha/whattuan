@@ -27,8 +27,17 @@ export const generateWeeksArray = (data: ActivityData[]): ActivityData[][] => {
   const weeks: ActivityData[][] = [];
   let currentWeek: ActivityData[] = [];
 
+  // Find the first day of the data
+  const firstDate = new Date(data[0].date);
+  const dayOfWeek = firstDate.getDay(); // 0 = Sunday, 1 = Monday, etc.
+
+  // Add empty days before the first date to align with correct day of week
+  for (let i = 0; i < dayOfWeek; i++) {
+    currentWeek.push({ date: '', count: 0 });
+  }
+
+  // Add the actual data
   data.forEach(day => {
-    const date = new Date(day.date);
     currentWeek.push(day);
     
     // Start a new week every 7 days
