@@ -1,12 +1,13 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import gsap from "gsap";
 import { createBreathingAnimation } from "@/utils/animationUtils";
 
 interface ImageIconProps {
   isVisible: boolean;
+  onClick?: () => void;
 }
 
-const ImageIcon = ({ isVisible }: ImageIconProps) => {
+const ImageIcon = ({ isVisible, onClick }: ImageIconProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const iconRef = useRef<SVGSVGElement>(null);
   const frameRef = useRef<SVGRectElement>(null);
@@ -31,16 +32,43 @@ const ImageIcon = ({ isVisible }: ImageIconProps) => {
     };
   }, [isVisible]);
 
+  const handleClick = useCallback((e: React.MouseEvent | React.KeyboardEvent) => {
+    if (e.stopPropagation) {
+      e.stopPropagation();
+    }
+
+    // Click animation
+    gsap.to(iconRef.current, {
+      scale: 0.9,
+      duration: 0.1,
+      yoyo: true,
+      repeat: 1,
+      onComplete: () => onClick?.()
+    });
+  }, [onClick]);
+
+  const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleClick(e);
+    }
+  }, [handleClick]);
+
   return (
     <div 
       ref={containerRef}
-      className="relative w-8 h-8 flex items-center justify-center"
+      className="relative w-8 h-8 flex items-center justify-center cursor-pointer"
+      onClick={handleClick}
+      onKeyDown={handleKeyPress}
+      tabIndex={0}
+      role="button"
+      aria-label="Image gallery"
     >
       <svg 
         ref={iconRef}
         width="32" 
         height="32" 
-        viewBox="10 10 180 180" 
+        viewBox="-2 -2 102 100"
         fill="none" 
         xmlns="http://www.w3.org/2000/svg"
         className="text-white"
@@ -48,32 +76,32 @@ const ImageIcon = ({ isVisible }: ImageIconProps) => {
         {/* Outer frame */}
         <rect
           ref={frameRef}
-          x="20"
-          y="20"
-          width="160"
-          height="160"
-          rx="12"
-          ry="12"
+          x="4"
+          y="4"
+          width="92"
+          height="92"
+          rx="8"
+          ry="8"
           stroke="currentColor"
-          strokeWidth="12"
+          strokeWidth="4"
           fill="none"
         />
         
         {/* Mountain path */}
         <path
           ref={mountainRef}
-          d="M 40 140 Q 100 80 160 140"
+          d="M 20 70 Q 48 40 80 70"
           stroke="currentColor"
-          strokeWidth="12"
+          strokeWidth="4"
           fill="none"
         />
         
         {/* Sun */}
         <circle
           ref={sunRef}
-          cx="100"
-          cy="60"
-          r="12"
+          cx="48"
+          cy="30"
+          r="8"
           fill="currentColor"
         />
       </svg>

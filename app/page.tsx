@@ -12,13 +12,14 @@ export default function Home() {
   const [isImageIconVisible, setIsImageIconVisible] = useState(false);
   const [isGithubIconVisible, setIsGithubIconVisible] = useState(false);
   const [isChartOpen, setIsChartOpen] = useState(false);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
 
   useEffect(() => {
     // Initial setup - position icons at their starting points
     gsap.set([imageIconRef.current, githubIconRef.current], {
       opacity: 0,
       scale: 0.8,
-      y: 0,
+      y: -50,
       x: 0
     });
 
@@ -42,29 +43,29 @@ export default function Home() {
       }
     });
 
-    // Add both animations to the timeline
+    // Add both animations to the timeline with staggered starts
     tl.to([imageIconRef.current, githubIconRef.current], {
       opacity: 1,
       scale: 1,
-      duration: 0.3,
-      ease: "back.out(1.7)",
-    }, 0) // Start at the same time
+      duration: 0.4,
+      ease: "power2.out",
+    }, 0)
     .to(imageIconRef.current, {
-      y: 100,
-      duration: 0.5,
+      y: 150,
+      duration: 0.6,
       ease: "back.out(1.7)",
-    }, 0) // Start at the same time
+    }, 0.1)
     .to(githubIconRef.current, {
       x: -100,
       y: -100,
       duration: 0.5,
       ease: "back.out(1.7)",
-    }, 0); // Start at the same time
+    }, 0);
   };
 
   const handleMouseLeave = () => {
-    // Don't hide if chart is open
-    if (isChartOpen) return;
+    // Don't hide if chart or gallery is open
+    if (isChartOpen || isGalleryOpen) return;
 
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -81,20 +82,20 @@ export default function Home() {
       tl.to([imageIconRef.current, githubIconRef.current], {
         opacity: 0,
         scale: 0.8,
-        duration: 0.3,
+        duration: 0.4,
         ease: "power2.inOut",
-      }, 0) // Start at the same time
+      }, 0)
       .to(imageIconRef.current, {
-        y: 0,
-        duration: 0.3,
+        y: -50,
+        duration: 0.4,
         ease: "power2.inOut",
-      }, 0) // Start at the same time
+      }, 0)
       .to(githubIconRef.current, {
         x: 0,
         y: 0,
-        duration: 0.3,
+        duration: 0.4,
         ease: "power2.inOut",
-      }, 0); // Start at the same time
+      }, 0);
     }, 3000);
   };
 
@@ -113,22 +114,28 @@ export default function Home() {
         {/* Image icon container - South */}
         <div 
           ref={imageIconRef}
-          className="absolute left-1/2 top-0 -translate-x-1/2"
+          className="absolute left-1/2 top-0 -translate-x-1/2 transform-gpu"
           style={{ pointerEvents: isImageIconVisible ? 'auto' : 'none' }}
         >
-          <ImageIcon isVisible={isImageIconVisible} />
+          <ImageIcon 
+            isVisible={isImageIconVisible} 
+            onClick={() => setIsGalleryOpen(true)}
+          />
         </div>
 
         {/* GitHub icon container - Northwest */}
         <div 
           ref={githubIconRef}
-          className="absolute left-1/2 top-0 -translate-x-1/2"
+          className="absolute left-1/2 top-0 -translate-x-1/2 transform-gpu"
           style={{ pointerEvents: isGithubIconVisible ? 'auto' : 'none' }}
         >
           <GitHubIcon 
             isVisible={isGithubIconVisible} 
             onChartOpen={() => setIsChartOpen(true)}
-            onChartClose={() => setIsChartOpen(false)}
+            onChartClose={() => {
+              setIsChartOpen(false);
+              handleMouseLeave();
+            }}
           />
         </div>
       </div>
