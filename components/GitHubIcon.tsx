@@ -3,6 +3,7 @@ import gsap from "gsap";
 import ActivityChart from "@/components/ActivityChart";
 import { createBreathingAnimation } from "@/utils/animationUtils";
 import { ActivityData } from "@/types/activity";
+import { fetchGitHubContributions } from "@/utils/githubApi";
 
 interface GitHubIconProps {
   isVisible: boolean;
@@ -16,12 +17,7 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
   onChartClose 
 }) => {
   const [showChart, setShowChart] = useState(false);
-  const [contributionData, setContributionData] = useState<ActivityData[]>([
-    { date: '2025-01-01', count: 2 },
-    { date: '2025-01-02', count: 2 },
-    { date: '2025-01-07', count: 1 },
-    { date: '2025-01-08', count: 1 }
-  ]);
+  const [contributionData, setContributionData] = useState<ActivityData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   
   const containerRef = useRef<HTMLDivElement>(null);
@@ -30,43 +26,20 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
   const pathRef = useRef<SVGPathElement>(null);
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
+  // Reset chart state when visibility changes
+  useEffect(() => {
+    if (!isVisible) {
+      setShowChart(false);
+    }
+  }, [isVisible]);
+
   // Fetch GitHub contributions
   const fetchContributions = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('https://api.github.com/users/kimbucha/events');
-      const events = await response.json();
-      
-      const contributions = new Map<string, number>();
-      events.forEach((event: any) => {
-        // Count all contribution types
-        if ([
-          'PushEvent',
-          'CreateEvent',
-          'PullRequestEvent',
-          'IssuesEvent',
-          'CommitCommentEvent',
-          'PullRequestReviewEvent'
-        ].includes(event.type)) {
-          const date = event.created_at.split('T')[0];
-          let count = 1; // Default count for most events
-          
-          // For push events, count the commits
-          if (event.type === 'PushEvent') {
-            count = event.payload.commits?.length || 1;
-          }
-          
-          contributions.set(date, (contributions.get(date) || 0) + count);
-        }
-      });
-
-      const newData = Array.from(contributions.entries())
-        .map(([date, count]) => ({ date, count }))
-        .filter(d => d.date.startsWith('2025'))
-        .sort((a, b) => a.date.localeCompare(b.date)); // Sort by date
-
-      if (newData.length > 0) {
-        setContributionData(newData);
+      const contributions = await fetchGitHubContributions('kimbucha');
+      if (contributions.length > 0) {
+        setContributionData(contributions);
       }
     } catch (error) {
       console.error('Failed to fetch contributions:', error);
@@ -195,9 +168,15 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
             role="dialog"
             aria-modal="true"
             aria-label="GitHub activity chart"
-            onClick={(e) => e.stopPropagation()}
+            onMouseEnter={(e) => e.stopPropagation()}
+            onMouseLeave={(e) => e.stopPropagation()}
           >
-            <div className="bg-[#161b22] rounded-lg shadow-xl p-4">
+            <div 
+              className="bg-[#161b22] rounded-lg shadow-xl p-4"
+              onClick={(e) => e.stopPropagation()}
+              onMouseEnter={(e) => e.stopPropagation()}
+              onMouseLeave={(e) => e.stopPropagation()}
+            >
               {isLoading ? (
                 <div className="flex items-center justify-center h-[128px] text-[#7d8590] text-sm">
                   Loading contributions...

@@ -63,46 +63,62 @@ export default function Home() {
     }, 0);
   };
 
-  const handleMouseLeave = () => {
-    // Don't hide if chart or gallery is open
-    if (isChartOpen || isGalleryOpen) return;
+  const hideIcons = () => {
+    setIsImageIconVisible(false);
+    setIsGithubIconVisible(false);
 
+    // Create a timeline for synchronized hiding
+    const tl = gsap.timeline();
+
+    // Add both hide animations to the timeline
+    tl.to([imageIconRef.current, githubIconRef.current], {
+      opacity: 0,
+      scale: 0.8,
+      duration: 0.4,
+      ease: "power2.inOut",
+    }, 0)
+    .to(imageIconRef.current, {
+      y: -50,
+      duration: 0.4,
+      ease: "power2.inOut",
+    }, 0)
+    .to(githubIconRef.current, {
+      x: 0,
+      y: 0,
+      duration: 0.4,
+      ease: "power2.inOut",
+    }, 0);
+  };
+
+  const startHideTimeout = () => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
 
-    timeoutRef.current = setTimeout(() => {
-      setIsImageIconVisible(false);
-      setIsGithubIconVisible(false);
+    timeoutRef.current = setTimeout(hideIcons, 3000);
+  };
 
-      // Create a timeline for synchronized hiding
-      const tl = gsap.timeline();
+  const handleMouseLeave = (e?: React.MouseEvent) => {
+    // Don't hide if chart or gallery is open
+    if (isChartOpen || isGalleryOpen) return;
 
-      // Add both hide animations to the timeline
-      tl.to([imageIconRef.current, githubIconRef.current], {
-        opacity: 0,
-        scale: 0.8,
-        duration: 0.4,
-        ease: "power2.inOut",
-      }, 0)
-      .to(imageIconRef.current, {
-        y: -50,
-        duration: 0.4,
-        ease: "power2.inOut",
-      }, 0)
-      .to(githubIconRef.current, {
-        x: 0,
-        y: 0,
-        duration: 0.4,
-        ease: "power2.inOut",
-      }, 0);
-    }, 3000);
+    // Check if we're moving to the chart or icon
+    if (e?.relatedTarget instanceof HTMLElement) {
+      const target = e.relatedTarget;
+      if (target.closest('[role="dialog"]') || 
+          target.closest('[role="button"]') ||
+          target === githubIconRef.current ||
+          target === imageIconRef.current) {
+        return;
+      }
+    }
+
+    startHideTimeout();
   };
 
   return (
     <main className="flex min-h-screen items-center justify-center">
       <div className="relative">
-        {/* The word "what" */}
         <h1 
           className="font-times text-white text-4xl cursor-pointer relative z-10"
           onMouseEnter={handleMouseEnter}
@@ -111,7 +127,6 @@ export default function Home() {
           what
         </h1>
 
-        {/* Image icon container - South */}
         <div 
           ref={imageIconRef}
           className="absolute left-1/2 top-0 -translate-x-1/2 transform-gpu"
@@ -123,7 +138,6 @@ export default function Home() {
           />
         </div>
 
-        {/* GitHub icon container - Northwest */}
         <div 
           ref={githubIconRef}
           className="absolute left-1/2 top-0 -translate-x-1/2 transform-gpu"
@@ -131,10 +145,15 @@ export default function Home() {
         >
           <GitHubIcon 
             isVisible={isGithubIconVisible} 
-            onChartOpen={() => setIsChartOpen(true)}
+            onChartOpen={() => {
+              setIsChartOpen(true);
+              if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+              }
+            }}
             onChartClose={() => {
               setIsChartOpen(false);
-              handleMouseLeave();
+              startHideTimeout();
             }}
           />
         </div>

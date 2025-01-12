@@ -1,29 +1,74 @@
 import { ActivityData } from '../types/activity';
 
+const GITHUB_API_URL = 'https://api.github.com/graphql';
+
 /**
- * Fetches GitHub contribution data for a user
+ * Fetches GitHub contribution data for a user using GraphQL API
  */
 export async function fetchGitHubContributions(username: string): Promise<ActivityData[]> {
+  // Get token from environment variable
+  const token = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
+  
+  if (!token) {
+    console.error('GitHub token not found');
+    return [];
+  }
+
   try {
-    const response = await fetch(`https://api.github.com/users/${username}/events/public`);
+    const query = `
+      query($username: String!) {
+        user(login: $username) {
+          contributionsCollection {
+            contributionCalendar {
+              totalContributions
+              weeks {
+                contributionDays {
+                  contributionCount
+                  date
+                }
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    const response = await fetch(GITHUB_API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query,
+        variables: { username },
+      }),
+    });
+
     if (!response.ok) {
       throw new Error('Failed to fetch GitHub data');
     }
 
-    const events = await response.json();
-    const contributions = new Map<string, number>();
+    const data = await response.json();
+    
+    if (data.errors) {
+      throw new Error(data.errors[0].message);
+    }
 
-    // Process events into daily contributions
-    events.forEach((event: any) => {
-      const date = event.created_at.split('T')[0];
-      contributions.set(date, (contributions.get(date) || 0) + 1);
+    const calendar = data.data.user.contributionsCollection.contributionCalendar;
+    const contributions: ActivityData[] = [];
+
+    // Flatten the weeks array into a single array of contribution days
+    calendar.weeks.forEach((week: any) => {
+      week.contributionDays.forEach((day: any) => {
+        contributions.push({
+          date: day.date,
+          count: day.contributionCount
+        });
+      });
     });
 
-    // Convert to ActivityData array
-    return Array.from(contributions.entries()).map(([date, count]) => ({
-      date,
-      count
-    }));
+    return contributions;
   } catch (error) {
     console.error('Error fetching GitHub contributions:', error);
     return [];
