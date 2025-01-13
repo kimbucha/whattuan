@@ -109,13 +109,14 @@ export default function Home() {
     // Don't hide if chart or gallery is open
     if (isChartOpen || isGalleryOpen) return;
 
-    // Check if we're moving to the chart or icon
+    // Check if we're moving to the icons or their containers
     if (e?.relatedTarget instanceof HTMLElement) {
       const target = e.relatedTarget;
       if (target.closest('[role="dialog"]') || 
           target.closest('[role="button"]') ||
-          target === githubIconRef.current ||
-          target === imageIconRef.current) {
+          target === imageIconRef.current?.parentElement ||
+          target === githubIconRef.current?.parentElement ||
+          target.closest('.icon-container')) {
         return;
       }
     }
@@ -137,10 +138,12 @@ export default function Home() {
 
         <div 
           ref={imageIconRef}
-          className="absolute left-1/2 top-1/2 transform-gpu will-change-transform"
+          className="absolute left-1/2 top-1/2 transform-gpu will-change-transform icon-container"
           style={{ 
             pointerEvents: isImageIconVisible ? 'auto' : 'none',
           }}
+          onMouseEnter={(e) => e.stopPropagation()}
+          onMouseLeave={handleMouseLeave}
         >
           <ImageIcon 
             isVisible={isImageIconVisible} 
@@ -150,10 +153,12 @@ export default function Home() {
 
         <div 
           ref={githubIconRef}
-          className="absolute left-1/2 top-1/2 transform-gpu will-change-transform"
+          className="absolute left-1/2 top-1/2 transform-gpu will-change-transform icon-container"
           style={{ 
             pointerEvents: isGithubIconVisible ? 'auto' : 'none',
           }}
+          onMouseEnter={(e) => e.stopPropagation()}
+          onMouseLeave={handleMouseLeave}
         >
           <GitHubIcon 
             isVisible={isGithubIconVisible} 
