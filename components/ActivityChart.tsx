@@ -56,8 +56,9 @@ const ActivityChart: React.FC<ActivityChartProps> = ({
       {/* Month labels */}
       <div className="flex mb-2">
         <div className="w-8" /> {/* Spacer for day labels */}
-        <div className="flex-1 flex text-[#7d8590] text-xs">
-          <div className="w-[10px]">Jan</div>
+        <div className="flex-1 flex items-center text-[#7d8590] text-xs">
+          <div className="min-w-[24px]">Jan</div>
+          <div className="opacity-60">2025</div>
         </div>
       </div>
 

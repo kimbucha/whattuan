@@ -162,6 +162,7 @@ export default function Home() {
         >
           <GitHubIcon 
             isVisible={isGithubIconVisible} 
+            username="kimbucha"
             onChartOpen={() => {
               setIsChartOpen(true);
               if (timeoutRef.current) {

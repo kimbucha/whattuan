@@ -9,12 +9,14 @@ interface GitHubIconProps {
   isVisible: boolean;
   onChartOpen?: () => void;
   onChartClose?: () => void;
+  username: string;
 }
 
 const GitHubIcon: React.FC<GitHubIconProps> = ({ 
   isVisible, 
   onChartOpen, 
-  onChartClose 
+  onChartClose,
+  username
 }) => {
   const [showChart, setShowChart] = useState(false);
   const [contributionData, setContributionData] = useState<ActivityData[]>([]);
@@ -37,7 +39,7 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
   const fetchContributions = useCallback(async () => {
     try {
       setIsLoading(true);
-      const contributions = await fetchGitHubContributions('kimbucha');
+      const contributions = await fetchGitHubContributions(username);
       if (contributions.length > 0) {
         setContributionData(contributions);
       }
@@ -46,7 +48,7 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [username]);
 
   // Setup breathing animation
   useEffect(() => {
@@ -67,13 +69,18 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
     }
 
     if (!showChart) {
-      // Click animation
-      gsap.to(iconRef.current, {
-        scale: 0.9,
-        duration: 0.1,
-        yoyo: true,
-        repeat: 1
-      });
+      // Updated click animation to be smoother and maintain circular shape
+      gsap.timeline()
+        .to(iconRef.current, {
+          scale: 0.92,
+          duration: 0.15,
+          ease: "power2.out"
+        })
+        .to(iconRef.current, {
+          scale: 1,
+          duration: 0.15,
+          ease: "power2.in"
+        });
 
       // Fetch and show chart
       fetchContributions();
@@ -131,8 +138,8 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
     >
       <svg
         ref={iconRef}
-        width="32"
-        height="32"
+        width="30"
+        height="30"
         viewBox="-2 -2 102 100"
         xmlns="http://www.w3.org/2000/svg"
         className="text-white"
