@@ -39,7 +39,9 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
   const fetchContributions = useCallback(async () => {
     try {
       setIsLoading(true);
+      console.log('Fetching contributions for:', username);
       const contributions = await fetchGitHubContributions(username);
+      console.log('Received contributions:', contributions);
       if (contributions.length > 0) {
         setContributionData(contributions);
       }

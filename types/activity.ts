@@ -6,6 +6,8 @@ export interface ActivityData {
   date: string;
   /** Number of activities/contributions for the day */
   count: number;
+  /** Color representing the activity level */
+  color?: string;
 }
 
 /**

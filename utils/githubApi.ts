@@ -18,13 +18,14 @@ export async function fetchGitHubContributions(username: string): Promise<Activi
     const query = `
       query($username: String!) {
         user(login: $username) {
-          contributionsCollection {
+          contributionsCollection(from: "${new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString()}", to: "${new Date().toISOString()}") {
             contributionCalendar {
               totalContributions
               weeks {
                 contributionDays {
                   contributionCount
                   date
+                  color
                 }
               }
             }
@@ -52,6 +53,7 @@ export async function fetchGitHubContributions(username: string): Promise<Activi
     const data = await response.json();
     
     if (data.errors) {
+      console.error('GitHub API Error:', data.errors[0]);
       throw new Error(data.errors[0].message);
     }
 
@@ -63,7 +65,8 @@ export async function fetchGitHubContributions(username: string): Promise<Activi
       week.contributionDays.forEach((day: any) => {
         contributions.push({
           date: day.date,
-          count: day.contributionCount
+          count: day.contributionCount,
+          color: day.color
         });
       });
     });
