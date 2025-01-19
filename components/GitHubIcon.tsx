@@ -81,7 +81,8 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
 
   // Handle icon click
   const handleClick = useCallback(async (e?: React.MouseEvent | React.KeyboardEvent) => {
-    if (e?.stopPropagation) {
+    if (e) {
+      e.preventDefault();
       e.stopPropagation();
     }
 
@@ -118,7 +119,7 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
     } else {
       closeChart();
     }
-  }, [showChart, onChartOpen, fetchContributions]);
+  }, [showChart, onChartOpen, fetchContributions, closeChart]);
 
   const closeChart = useCallback(() => {
     if (chartContainerRef.current) {

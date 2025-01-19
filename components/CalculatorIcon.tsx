@@ -14,6 +14,10 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
   onCalculatorClose 
 }) => {
   const [showCalculator, setShowCalculator] = useState(false);
+  const [displayValue, setDisplayValue] = useState("0");
+  const [previousValue, setPreviousValue] = useState<string | null>(null);
+  const [operator, setOperator] = useState<string | null>(null);
+  const [waitingForOperand, setWaitingForOperand] = useState(false);
   
   const containerRef = useRef<HTMLDivElement>(null);
   const iconRef = useRef<SVGSVGElement>(null);
@@ -123,6 +127,89 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
     }
   }, [handleClick, showCalculator, closeCalculator]);
 
+  const handleNumber = (num: string) => {
+    if (waitingForOperand) {
+      setDisplayValue(num);
+      setWaitingForOperand(false);
+    } else {
+      setDisplayValue(displayValue === "0" ? num : displayValue + num);
+    }
+  };
+
+  const handleOperator = (op: string) => {
+    const value = parseFloat(displayValue);
+    
+    if (previousValue === null) {
+      setPreviousValue(displayValue);
+    } else if (operator) {
+      const prev = parseFloat(previousValue);
+      let result: number;
+      
+      switch (operator) {
+        case "+":
+          result = prev + value;
+          break;
+        case "-":
+          result = prev - value;
+          break;
+        case "×":
+          result = prev * value;
+          break;
+        case "÷":
+          result = prev / value;
+          break;
+        default:
+          return;
+      }
+      
+      setPreviousValue(String(result));
+      setDisplayValue(String(result));
+    }
+    
+    setWaitingForOperand(true);
+    setOperator(op);
+  };
+
+  const handleEqual = () => {
+    if (!operator || previousValue === null) return;
+    
+    const value = parseFloat(displayValue);
+    const prev = parseFloat(previousValue);
+    let result: number;
+    
+    switch (operator) {
+      case "+":
+        result = prev + value;
+        break;
+      case "-":
+        result = prev - value;
+        break;
+      case "×":
+        result = prev * value;
+        break;
+      case "÷":
+        result = prev / value;
+        break;
+      default:
+        return;
+    }
+    
+    setDisplayValue(String(result));
+    setPreviousValue(null);
+    setOperator(null);
+    setWaitingForOperand(true);
+  };
+
+  const handleClear = () => {
+    setDisplayValue("0");
+    setPreviousValue(null);
+    setOperator(null);
+    setWaitingForOperand(false);
+  };
+
+  const buttonClass = "h-14 rounded bg-[#21262d] hover:bg-[#30363d] text-white font-medium text-lg transition-colors";
+  const operatorClass = "h-14 rounded bg-[#1f6feb] hover:bg-[#388bfd] text-white font-medium text-lg transition-colors";
+
   return (
     <div 
       ref={containerRef}
@@ -182,21 +269,37 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
               className="bg-[#161b22] rounded-lg shadow-xl p-4"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Calculator UI will go here */}
-              <div className="w-[300px] h-[400px] flex flex-col">
-                <div className="bg-[#0d1117] p-4 rounded-t-lg">
+              <div className="w-[300px] flex flex-col gap-2">
+                <div className="bg-[#0d1117] p-4 rounded-lg mb-2">
                   <input 
                     type="text" 
-                    className="w-full bg-transparent text-right text-2xl text-white outline-none"
+                    className="w-full bg-transparent text-right text-3xl text-white font-medium outline-none"
                     readOnly
-                    value="0"
+                    value={displayValue}
                   />
                 </div>
-                <div className="grid grid-cols-4 gap-2 p-4">
-                  {/* Calculator buttons will go here */}
-                  <div className="col-span-4 text-[#7d8590] text-sm text-center">
-                    Calculator coming soon...
-                  </div>
+                <div className="grid grid-cols-4 gap-2">
+                  <button onClick={handleClear} className={`${buttonClass} col-span-2`}>C</button>
+                  <button onClick={() => handleOperator('÷')} className={operatorClass}>÷</button>
+                  <button onClick={() => handleOperator('×')} className={operatorClass}>×</button>
+                  
+                  <button onClick={() => handleNumber('7')} className={buttonClass}>7</button>
+                  <button onClick={() => handleNumber('8')} className={buttonClass}>8</button>
+                  <button onClick={() => handleNumber('9')} className={buttonClass}>9</button>
+                  <button onClick={() => handleOperator('-')} className={operatorClass}>−</button>
+                  
+                  <button onClick={() => handleNumber('4')} className={buttonClass}>4</button>
+                  <button onClick={() => handleNumber('5')} className={buttonClass}>5</button>
+                  <button onClick={() => handleNumber('6')} className={buttonClass}>6</button>
+                  <button onClick={() => handleOperator('+')} className={operatorClass}>+</button>
+                  
+                  <button onClick={() => handleNumber('1')} className={buttonClass}>1</button>
+                  <button onClick={() => handleNumber('2')} className={buttonClass}>2</button>
+                  <button onClick={() => handleNumber('3')} className={buttonClass}>3</button>
+                  <button onClick={handleEqual} className={`${operatorClass} row-span-2`}>=</button>
+                  
+                  <button onClick={() => handleNumber('0')} className={`${buttonClass} col-span-2`}>0</button>
+                  <button onClick={() => handleNumber('.')} className={buttonClass}>.</button>
                 </div>
               </div>
             </div>
