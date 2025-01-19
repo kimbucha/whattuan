@@ -27,6 +27,16 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
   const circleRef = useRef<SVGCircleElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
   const chartContainerRef = useRef<HTMLDivElement>(null);
+  const animationRef = useRef<gsap.Context>();
+
+  // Cleanup GSAP animations on unmount
+  useEffect(() => {
+    return () => {
+      if (animationRef.current) {
+        animationRef.current.revert();
+      }
+    };
+  }, []);
 
   // Reset chart state when visibility changes
   useEffect(() => {
@@ -55,13 +65,18 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
   // Setup breathing animation
   useEffect(() => {
     if (isVisible && containerRef.current && iconRef.current && circleRef.current && pathRef.current) {
-      createBreathingAnimation({
+      animationRef.current = createBreathingAnimation({
         container: containerRef.current,
         icon: iconRef.current,
         elements: [circleRef.current, pathRef.current],
         isVisible
       });
     }
+    return () => {
+      if (animationRef.current) {
+        animationRef.current.revert();
+      }
+    };
   }, [isVisible]);
 
   // Handle icon click
@@ -70,22 +85,22 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
       e.stopPropagation();
     }
 
-    if (!showChart) {
-      // Updated click animation to be smoother and maintain circular shape
-      gsap.timeline()
-        .to(iconRef.current, {
-          scale: 0.92,
-          duration: 0.15,
-          ease: "power2.out"
-        })
-        .to(iconRef.current, {
-          scale: 1,
-          duration: 0.15,
-          ease: "power2.in"
-        });
+    if (!showChart && iconRef.current && chartContainerRef.current) {
+      // Click animation
+      const timeline = gsap.timeline();
+      timeline.to(iconRef.current, {
+        scale: 0.92,
+        duration: 0.15,
+        ease: "power2.out"
+      })
+      .to(iconRef.current, {
+        scale: 1,
+        duration: 0.15,
+        ease: "power2.in"
+      });
 
       // Fetch and show chart
-      fetchContributions();
+      await fetchContributions();
       gsap.fromTo(chartContainerRef.current,
         { opacity: 0, scale: 0.95, y: 20 },
         {
@@ -106,17 +121,22 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
   }, [showChart, onChartOpen, fetchContributions]);
 
   const closeChart = useCallback(() => {
-    gsap.to(chartContainerRef.current, {
-      opacity: 0,
-      scale: 0.95,
-      y: 20,
-      duration: 0.2,
-      ease: "power2.in",
-      onComplete: () => {
-        setShowChart(false);
-        onChartClose?.();
-      }
-    });
+    if (chartContainerRef.current) {
+      gsap.to(chartContainerRef.current, {
+        opacity: 0,
+        scale: 0.95,
+        y: 20,
+        duration: 0.2,
+        ease: "power2.in",
+        onComplete: () => {
+          setShowChart(false);
+          onChartClose?.();
+        }
+      });
+    } else {
+      setShowChart(false);
+      onChartClose?.();
+    }
   }, [onChartClose]);
 
   const handleKeyPress = useCallback((e: React.KeyboardEvent) => {

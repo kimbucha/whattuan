@@ -20,6 +20,16 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
   const circleRef = useRef<SVGCircleElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
   const calculatorContainerRef = useRef<HTMLDivElement>(null);
+  const animationRef = useRef<gsap.Context>();
+
+  // Cleanup GSAP animations on unmount
+  useEffect(() => {
+    return () => {
+      if (animationRef.current) {
+        animationRef.current.revert();
+      }
+    };
+  }, []);
 
   // Reset calculator state when visibility changes
   useEffect(() => {
@@ -31,13 +41,18 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
   // Setup breathing animation
   useEffect(() => {
     if (isVisible && containerRef.current && iconRef.current && circleRef.current && pathRef.current) {
-      createBreathingAnimation({
+      animationRef.current = createBreathingAnimation({
         container: containerRef.current,
         icon: iconRef.current,
         elements: [circleRef.current, pathRef.current],
         isVisible
       });
     }
+    return () => {
+      if (animationRef.current) {
+        animationRef.current.revert();
+      }
+    };
   }, [isVisible]);
 
   // Handle icon click
@@ -46,19 +61,19 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
       e.stopPropagation();
     }
 
-    if (!showCalculator) {
+    if (!showCalculator && iconRef.current && calculatorContainerRef.current) {
       // Click animation
-      gsap.timeline()
-        .to(iconRef.current, {
-          scale: 0.92,
-          duration: 0.15,
-          ease: "power2.out"
-        })
-        .to(iconRef.current, {
-          scale: 1,
-          duration: 0.15,
-          ease: "power2.in"
-        });
+      const timeline = gsap.timeline();
+      timeline.to(iconRef.current, {
+        scale: 0.92,
+        duration: 0.15,
+        ease: "power2.out"
+      })
+      .to(iconRef.current, {
+        scale: 1,
+        duration: 0.15,
+        ease: "power2.in"
+      });
 
       // Show calculator
       gsap.fromTo(calculatorContainerRef.current,
@@ -81,17 +96,22 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
   }, [showCalculator, onCalculatorOpen]);
 
   const closeCalculator = useCallback(() => {
-    gsap.to(calculatorContainerRef.current, {
-      opacity: 0,
-      scale: 0.95,
-      y: 20,
-      duration: 0.2,
-      ease: "power2.in",
-      onComplete: () => {
-        setShowCalculator(false);
-        onCalculatorClose?.();
-      }
-    });
+    if (calculatorContainerRef.current) {
+      gsap.to(calculatorContainerRef.current, {
+        opacity: 0,
+        scale: 0.95,
+        y: 20,
+        duration: 0.2,
+        ease: "power2.in",
+        onComplete: () => {
+          setShowCalculator(false);
+          onCalculatorClose?.();
+        }
+      });
+    } else {
+      setShowCalculator(false);
+      onCalculatorClose?.();
+    }
   }, [onCalculatorClose]);
 
   const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
