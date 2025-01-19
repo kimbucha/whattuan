@@ -143,7 +143,10 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
         <>
           <div 
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-            onClick={closeCalculator}
+            onClick={(e) => {
+              e.stopPropagation();
+              closeCalculator();
+            }}
             aria-hidden="true"
           />
           <div 
@@ -152,14 +155,10 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
             role="dialog"
             aria-modal="true"
             aria-label="Calculator"
-            onMouseEnter={(e) => e.stopPropagation()}
-            onMouseLeave={(e) => e.stopPropagation()}
           >
             <div 
               className="bg-[#161b22] rounded-lg shadow-xl p-4"
               onClick={(e) => e.stopPropagation()}
-              onMouseEnter={(e) => e.stopPropagation()}
-              onMouseLeave={(e) => e.stopPropagation()}
             >
               {/* Calculator UI will go here */}
               <div className="w-[300px] h-[400px] flex flex-col">

@@ -114,7 +114,13 @@ export default function Home() {
 
   const handleMouseLeave = (e?: React.MouseEvent) => {
     // Don't hide if any modal is open
-    if (isChartOpen || isGalleryOpen || isCalculatorOpen) return;
+    if (isChartOpen || isGalleryOpen || isCalculatorOpen) {
+      // Only keep visible the icon whose modal is open
+      setIsImageIconVisible(isGalleryOpen);
+      setIsGithubIconVisible(isChartOpen);
+      setIsCalculatorIconVisible(isCalculatorOpen);
+      return;
+    }
 
     // Check if we're moving to the icons or their containers
     if (e?.relatedTarget instanceof HTMLElement) {
