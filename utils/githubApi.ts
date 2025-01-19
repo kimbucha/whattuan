@@ -10,15 +10,20 @@ export async function fetchGitHubContributions(username: string): Promise<Activi
   const token = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
   
   if (!token) {
-    console.error('GitHub token not found');
+    console.error('GitHub token not found in environment variables');
     return [];
   }
 
   try {
+    // Calculate date range for the past year
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setFullYear(endDate.getFullYear() - 1);
+
     const query = `
       query($username: String!) {
         user(login: $username) {
-          contributionsCollection(from: "${new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString()}", to: "${new Date().toISOString()}") {
+          contributionsCollection(from: "${startDate.toISOString()}", to: "${endDate.toISOString()}") {
             contributionCalendar {
               totalContributions
               weeks {
@@ -34,6 +39,9 @@ export async function fetchGitHubContributions(username: string): Promise<Activi
       }
     `;
 
+    console.log('Making request for user:', username);
+    console.log('Date range:', startDate.toISOString(), 'to', endDate.toISOString());
+
     const response = await fetch(GITHUB_API_URL, {
       method: 'POST',
       headers: {
@@ -46,15 +54,19 @@ export async function fetchGitHubContributions(username: string): Promise<Activi
       }),
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch GitHub data');
-    }
-
-    const data = await response.json();
+    console.log('Response status:', response.status);
+    
+    const responseText = await response.text();
+    const data = JSON.parse(responseText);
     
     if (data.errors) {
-      console.error('GitHub API Error:', data.errors[0]);
+      console.error('GitHub API Error:', data.errors);
       throw new Error(data.errors[0].message);
+    }
+
+    if (!data.data?.user?.contributionsCollection?.contributionCalendar) {
+      console.error('Invalid response format:', data);
+      return [];
     }
 
     const calendar = data.data.user.contributionsCollection.contributionCalendar;
@@ -71,6 +83,8 @@ export async function fetchGitHubContributions(username: string): Promise<Activi
       });
     });
 
+    console.log('Successfully fetched contributions:', contributions.length);
+    console.log('Total contributions:', calendar.totalContributions);
     return contributions;
   } catch (error) {
     console.error('Error fetching GitHub contributions:', error);
