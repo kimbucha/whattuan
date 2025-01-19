@@ -168,7 +168,11 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
         <>
           <div 
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-            onClick={closeChart}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              closeChart();
+            }}
             aria-hidden="true"
           />
           <div 
@@ -177,14 +181,11 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
             role="dialog"
             aria-modal="true"
             aria-label="GitHub activity chart"
-            onMouseEnter={(e) => e.stopPropagation()}
-            onMouseLeave={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
           >
             <div 
               className="bg-[#161b22] rounded-lg shadow-xl p-4"
               onClick={(e) => e.stopPropagation()}
-              onMouseEnter={(e) => e.stopPropagation()}
-              onMouseLeave={(e) => e.stopPropagation()}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center h-[128px] text-[#7d8590] text-sm">

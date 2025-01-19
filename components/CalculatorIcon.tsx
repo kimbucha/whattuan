@@ -144,6 +144,7 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
           <div 
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
             onClick={(e) => {
+              e.preventDefault();
               e.stopPropagation();
               closeCalculator();
             }}
@@ -155,6 +156,7 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
             role="dialog"
             aria-modal="true"
             aria-label="Calculator"
+            onClick={(e) => e.stopPropagation()}
           >
             <div 
               className="bg-[#161b22] rounded-lg shadow-xl p-4"
