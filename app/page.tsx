@@ -6,18 +6,27 @@ import ImageIcon from "@/components/ImageIcon";
 import GitHubIcon from "@/components/GitHubIcon";
 import CalculatorIcon from "@/components/CalculatorIcon";
 
+const HIDE_DELAY = 4.2; // seconds
+
 export default function Home() {
   const whatRef = useRef<HTMLHeadingElement>(null);
   const imageIconRef = useRef<HTMLDivElement>(null);
   const githubIconRef = useRef<HTMLDivElement>(null);
   const calculatorIconRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout>();
+  
   const [isImageIconVisible, setIsImageIconVisible] = useState(false);
   const [isGithubIconVisible, setIsGithubIconVisible] = useState(false);
   const [isCalculatorIconVisible, setIsCalculatorIconVisible] = useState(false);
+  
   const [isChartOpen, setIsChartOpen] = useState(false);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
+
+  // Track hover states
+  const [isImageIconHovered, setIsImageIconHovered] = useState(false);
+  const [isGithubIconHovered, setIsGithubIconHovered] = useState(false);
+  const [isCalculatorIconHovered, setIsCalculatorIconHovered] = useState(false);
 
   useEffect(() => {
     // Initial setup - position icons at their starting points
@@ -79,6 +88,19 @@ export default function Home() {
   };
 
   const hideIcons = () => {
+    // Don't hide if any modal is open
+    if (isChartOpen || isGalleryOpen || isCalculatorOpen) {
+      setIsImageIconVisible(isGalleryOpen);
+      setIsGithubIconVisible(isChartOpen);
+      setIsCalculatorIconVisible(isCalculatorOpen);
+      return;
+    }
+
+    // Don't hide if any icon is being hovered
+    if (isImageIconHovered || isGithubIconHovered || isCalculatorIconHovered) {
+      return;
+    }
+
     // Create a timeline for synchronized hiding
     const tl = gsap.timeline({
       onComplete: () => {
@@ -109,19 +131,24 @@ export default function Home() {
       clearTimeout(timeoutRef.current);
     }
 
-    timeoutRef.current = setTimeout(hideIcons, 3000);
+    timeoutRef.current = setTimeout(hideIcons, HIDE_DELAY * 1000);
+  };
+
+  const handleIconHover = (
+    isHovered: boolean, 
+    setHoverState: (state: boolean) => void
+  ) => {
+    setHoverState(isHovered);
+    if (isHovered) {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    } else {
+      startHideTimeout();
+    }
   };
 
   const handleMouseLeave = (e?: React.MouseEvent) => {
-    // Don't hide if any modal is open
-    if (isChartOpen || isGalleryOpen || isCalculatorOpen) {
-      // Only keep visible the icon whose modal is open
-      setIsImageIconVisible(isGalleryOpen);
-      setIsGithubIconVisible(isChartOpen);
-      setIsCalculatorIconVisible(isCalculatorOpen);
-      return;
-    }
-
     // Check if we're moving to the icons or their containers
     if (e?.relatedTarget instanceof HTMLElement) {
       const target = e.relatedTarget;
@@ -156,8 +183,8 @@ export default function Home() {
           style={{ 
             pointerEvents: isImageIconVisible ? 'auto' : 'none',
           }}
-          onMouseEnter={(e) => e.stopPropagation()}
-          onMouseLeave={handleMouseLeave}
+          onMouseEnter={() => handleIconHover(true, setIsImageIconHovered)}
+          onMouseLeave={() => handleIconHover(false, setIsImageIconHovered)}
         >
           <ImageIcon 
             isVisible={isImageIconVisible} 
@@ -171,14 +198,16 @@ export default function Home() {
           style={{ 
             pointerEvents: isGithubIconVisible ? 'auto' : 'none',
           }}
-          onMouseEnter={(e) => e.stopPropagation()}
-          onMouseLeave={handleMouseLeave}
+          onMouseEnter={() => handleIconHover(true, setIsGithubIconHovered)}
+          onMouseLeave={() => handleIconHover(false, setIsGithubIconHovered)}
         >
           <GitHubIcon 
             isVisible={isGithubIconVisible} 
             username="kimbucha"
             onChartOpen={() => {
               setIsChartOpen(true);
+              setIsImageIconVisible(false);
+              setIsCalculatorIconVisible(false);
               if (timeoutRef.current) {
                 clearTimeout(timeoutRef.current);
               }
@@ -196,13 +225,15 @@ export default function Home() {
           style={{ 
             pointerEvents: isCalculatorIconVisible ? 'auto' : 'none',
           }}
-          onMouseEnter={(e) => e.stopPropagation()}
-          onMouseLeave={handleMouseLeave}
+          onMouseEnter={() => handleIconHover(true, setIsCalculatorIconHovered)}
+          onMouseLeave={() => handleIconHover(false, setIsCalculatorIconHovered)}
         >
           <CalculatorIcon 
             isVisible={isCalculatorIconVisible}
             onCalculatorOpen={() => {
               setIsCalculatorOpen(true);
+              setIsImageIconVisible(false);
+              setIsGithubIconVisible(false);
               if (timeoutRef.current) {
                 clearTimeout(timeoutRef.current);
               }
