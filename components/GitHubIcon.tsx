@@ -99,12 +99,7 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
   }, [onChartClose]);
 
   // Handle icon click
-  const handleClick = useCallback(async (e?: React.MouseEvent | React.KeyboardEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-
+  const handleClick = useCallback(async () => {
     if (!showChart && iconRef.current && chartContainerRef.current) {
       // Click animation
       const timeline = gsap.timeline();
@@ -140,10 +135,20 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
     }
   }, [showChart, onChartOpen, fetchContributions, closeChart]);
 
+  const handleIconClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    handleClick();
+  };
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    closeChart();
+  };
+
   const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      handleClick(e);
+      handleClick();
     } else if (e.key === 'Escape' && showChart) {
       closeChart();
     }
@@ -153,7 +158,7 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
     <div 
       ref={containerRef}
       className="relative w-8 h-8 flex items-center justify-center cursor-pointer"
-      onClick={handleClick}
+      onClick={handleIconClick}
       onKeyDown={handleKeyPress}
       tabIndex={0}
       role="button"
@@ -189,11 +194,7 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
         <>
           <div 
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              closeChart();
-            }}
+            onClick={handleBackdropClick}
             aria-hidden="true"
           />
           <div 

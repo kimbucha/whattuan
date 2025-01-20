@@ -59,12 +59,27 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
     };
   }, [isVisible]);
 
-  // Handle icon click
-  const handleClick = useCallback((e?: React.MouseEvent | React.KeyboardEvent) => {
-    if (e?.stopPropagation) {
-      e.stopPropagation();
+  const closeCalculator = useCallback(() => {
+    if (calculatorContainerRef.current) {
+      gsap.to(calculatorContainerRef.current, {
+        opacity: 0,
+        scale: 0.95,
+        y: 20,
+        duration: 0.2,
+        ease: "power2.in",
+        onComplete: () => {
+          setShowCalculator(false);
+          onCalculatorClose?.();
+        }
+      });
+    } else {
+      setShowCalculator(false);
+      onCalculatorClose?.();
     }
+  }, [onCalculatorClose]);
 
+  // Handle icon click
+  const handleClick = useCallback(() => {
     if (!showCalculator && iconRef.current && calculatorContainerRef.current) {
       // Click animation
       const timeline = gsap.timeline();
@@ -97,31 +112,22 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
     } else {
       closeCalculator();
     }
-  }, [showCalculator, onCalculatorOpen]);
+  }, [showCalculator, onCalculatorOpen, closeCalculator]);
 
-  const closeCalculator = useCallback(() => {
-    if (calculatorContainerRef.current) {
-      gsap.to(calculatorContainerRef.current, {
-        opacity: 0,
-        scale: 0.95,
-        y: 20,
-        duration: 0.2,
-        ease: "power2.in",
-        onComplete: () => {
-          setShowCalculator(false);
-          onCalculatorClose?.();
-        }
-      });
-    } else {
-      setShowCalculator(false);
-      onCalculatorClose?.();
-    }
-  }, [onCalculatorClose]);
+  const handleIconClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    handleClick();
+  };
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    closeCalculator();
+  };
 
   const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      handleClick(e);
+      handleClick();
     } else if (e.key === 'Escape' && showCalculator) {
       closeCalculator();
     }
@@ -214,7 +220,7 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
     <div 
       ref={containerRef}
       className="relative w-8 h-8 flex items-center justify-center cursor-pointer"
-      onClick={handleClick}
+      onClick={handleIconClick}
       onKeyDown={handleKeyPress}
       tabIndex={0}
       role="button"
@@ -250,11 +256,7 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
         <>
           <div 
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              closeCalculator();
-            }}
+            onClick={handleBackdropClick}
             aria-hidden="true"
           />
           <div 
