@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import gsap from "gsap";
 import { createBreathingAnimation } from "@/utils/animationUtils";
+import { Draggable } from "gsap/Draggable";
+import { Physics2D } from "gsap/Physics2D";
+
+// Register plugins
+gsap.registerPlugin(Draggable, Physics2D);
 
 interface CalculatorIconProps {
   isVisible: boolean;
@@ -58,6 +63,53 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
       }
     };
   }, [isVisible]);
+
+  // Setup draggable and physics
+  useEffect(() => {
+    if (containerRef.current) {
+      // Create draggable instance
+      Draggable.create(containerRef.current, {
+        type: "x,y",
+        inertia: true,
+        bounds: window,
+        onDragStart: function() {
+          gsap.to(this.target, {
+            scale: 1.1,
+            duration: 0.2
+          });
+        },
+        onDragEnd: function() {
+          gsap.to(this.target, {
+            scale: 1,
+            duration: 0.2
+          });
+          
+          // Add floating animation
+          gsap.to(this.target, {
+            y: "+=20",
+            duration: 2,
+            ease: "power1.inOut",
+            yoyo: true,
+            repeat: -1
+          });
+        }
+      });
+
+      // Add initial floating animation
+      gsap.to(containerRef.current, {
+        y: "+=20",
+        duration: 2,
+        ease: "power1.inOut",
+        yoyo: true,
+        repeat: -1
+      });
+    }
+
+    return () => {
+      // Cleanup draggable instance
+      Draggable.get(containerRef.current)?.kill();
+    };
+  }, []);
 
   const closeCalculator = useCallback(() => {
     if (calculatorContainerRef.current) {
@@ -219,7 +271,10 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
   return (
     <div 
       ref={containerRef}
-      className="relative w-8 h-8 flex items-center justify-center cursor-pointer"
+      className="absolute w-8 h-8 flex items-center justify-center cursor-move"
+      style={{
+        touchAction: "none", // Prevent touch scrolling while dragging
+      }}
       onClick={handleIconClick}
       onKeyDown={handleKeyPress}
       tabIndex={0}

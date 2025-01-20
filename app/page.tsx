@@ -33,11 +33,14 @@ export default function Home() {
     gsap.set([imageIconRef.current, githubIconRef.current, calculatorIconRef.current], {
       opacity: 0,
       scale: 0.8,
-      y: 0,
-      x: 0,
       xPercent: -50,
       yPercent: -50
     });
+
+    // Set initial positions
+    gsap.set(imageIconRef.current, { x: 0, y: 100 });
+    gsap.set(githubIconRef.current, { x: -100, y: -100 });
+    gsap.set(calculatorIconRef.current, { x: 100, y: -100 });
 
     return () => {
       if (timeoutRef.current) {
@@ -60,31 +63,13 @@ export default function Home() {
       }
     });
 
-    // First fade in all icons
+    // Fade in all icons
     tl.to([imageIconRef.current, githubIconRef.current, calculatorIconRef.current], {
       opacity: 1,
       scale: 1,
       duration: 0.4,
       ease: "power2.out",
-    })
-    // Then move them to their positions
-    .to(imageIconRef.current, {
-      y: 100,
-      duration: 0.6,
-      ease: "back.out(1.7)",
-    }, "-=0.2")
-    .to(githubIconRef.current, {
-      x: -100,
-      y: -100,
-      duration: 0.5,
-      ease: "back.out(1.7)",
-    }, "-=0.4")
-    .to(calculatorIconRef.current, {
-      x: 100,
-      y: -100,
-      duration: 0.5,
-      ease: "back.out(1.7)",
-    }, "-=0.4");
+    });
   };
 
   const hideIcons = () => {
