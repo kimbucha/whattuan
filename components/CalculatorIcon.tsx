@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import gsap from "gsap";
-import { createBreathingAnimation } from "@/utils/animationUtils";
 import { Draggable } from "gsap/Draggable";
-import { Physics2D } from "gsap/Physics2D";
+import { createBreathingAnimation, showModal, hideModal, clickAnimation } from "@/utils/animationUtils";
+import { useDraggable } from "@/hooks/useDraggable";
 
-// Register plugins
-gsap.registerPlugin(Draggable, Physics2D);
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(Draggable);
+}
 
 interface CalculatorIconProps {
   isVisible: boolean;
@@ -31,6 +32,9 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
   const calculatorContainerRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<gsap.Context>();
 
+  // Apply draggable functionality
+  useDraggable(containerRef);
+
   // Cleanup GSAP animations on unmount
   useEffect(() => {
     return () => {
@@ -50,6 +54,7 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
   // Setup breathing animation
   useEffect(() => {
     if (isVisible && containerRef.current && iconRef.current && circleRef.current && pathRef.current) {
+      console.log('Setting up breathing animation');
       animationRef.current = createBreathingAnimation({
         container: containerRef.current,
         icon: iconRef.current,
@@ -59,69 +64,21 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
     }
     return () => {
       if (animationRef.current) {
+        console.log('Cleaning up breathing animation');
         animationRef.current.revert();
       }
     };
   }, [isVisible]);
 
-  // Setup draggable and physics
-  useEffect(() => {
-    if (containerRef.current) {
-      // Create draggable instance
-      Draggable.create(containerRef.current, {
-        type: "x,y",
-        inertia: true,
-        bounds: window,
-        onDragStart: function() {
-          gsap.to(this.target, {
-            scale: 1.1,
-            duration: 0.2
-          });
-        },
-        onDragEnd: function() {
-          gsap.to(this.target, {
-            scale: 1,
-            duration: 0.2
-          });
-          
-          // Add floating animation
-          gsap.to(this.target, {
-            y: "+=20",
-            duration: 2,
-            ease: "power1.inOut",
-            yoyo: true,
-            repeat: -1
-          });
-        }
-      });
-
-      // Add initial floating animation
-      gsap.to(containerRef.current, {
-        y: "+=20",
-        duration: 2,
-        ease: "power1.inOut",
-        yoyo: true,
-        repeat: -1
-      });
-    }
-
-    return () => {
-      // Cleanup draggable instance
-      Draggable.get(containerRef.current)?.kill();
-    };
-  }, []);
-
   const closeCalculator = useCallback(() => {
+    console.log('Closing calculator');
     if (calculatorContainerRef.current) {
-      gsap.to(calculatorContainerRef.current, {
-        opacity: 0,
-        scale: 0.95,
-        y: 20,
-        duration: 0.2,
-        ease: "power2.in",
+      hideModal({
+        element: calculatorContainerRef.current,
         onComplete: () => {
           setShowCalculator(false);
           onCalculatorClose?.();
+          console.log('Calculator closed');
         }
       });
     } else {
@@ -132,51 +89,40 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
 
   // Handle icon click
   const handleClick = useCallback(() => {
+    console.log('Icon clicked');
     if (!showCalculator && iconRef.current && calculatorContainerRef.current) {
       // Click animation
-      const timeline = gsap.timeline();
-      timeline.to(iconRef.current, {
-        scale: 0.92,
-        duration: 0.15,
-        ease: "power2.out"
-      })
-      .to(iconRef.current, {
-        scale: 1,
-        duration: 0.15,
-        ease: "power2.in"
-      });
+      clickAnimation(iconRef.current);
+      console.log('Opening calculator');
 
       // Show calculator
-      gsap.fromTo(calculatorContainerRef.current,
-        { opacity: 0, scale: 0.95, y: 20 },
-        {
-          opacity: 1,
-          scale: 1,
-          y: 0,
-          duration: 0.3,
-          ease: "power2.out",
-          onStart: () => {
-            setShowCalculator(true);
-            onCalculatorOpen?.();
-          }
+      showModal({
+        element: calculatorContainerRef.current,
+        onStart: () => {
+          setShowCalculator(true);
+          onCalculatorOpen?.();
+          console.log('Calculator opened');
         }
-      );
+      });
     } else {
       closeCalculator();
     }
   }, [showCalculator, onCalculatorOpen, closeCalculator]);
 
   const handleIconClick = (e: React.MouseEvent) => {
+    console.log('Icon clicked, preventing propagation');
     e.stopPropagation();
     handleClick();
   };
 
   const handleBackdropClick = (e: React.MouseEvent) => {
+    console.log('Backdrop clicked, closing calculator');
     e.stopPropagation();
     closeCalculator();
   };
 
   const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
+    console.log('Key pressed:', e.key);
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       handleClick();
@@ -186,6 +132,7 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
   }, [handleClick, showCalculator, closeCalculator]);
 
   const handleNumber = (num: string) => {
+    console.log('Number button pressed:', num);
     if (waitingForOperand) {
       setDisplayValue(num);
       setWaitingForOperand(false);
@@ -195,6 +142,7 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
   };
 
   const handleOperator = (op: string) => {
+    console.log('Operator button pressed:', op);
     const value = parseFloat(displayValue);
     
     if (previousValue === null) {
@@ -271,13 +219,15 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
   return (
     <div 
       ref={containerRef}
-      className="absolute w-8 h-8 flex items-center justify-center cursor-move"
+      className={`absolute w-8 h-8 flex items-center justify-center cursor-move touch-none ${!isVisible ? 'pointer-events-none' : ''}`}
       style={{
-        touchAction: "none", // Prevent touch scrolling while dragging
+        touchAction: "none",
+        visibility: isVisible ? 'visible' : 'hidden',
+        willChange: 'transform'
       }}
       onClick={handleIconClick}
       onKeyDown={handleKeyPress}
-      tabIndex={0}
+      tabIndex={isVisible ? 0 : -1}
       role="button"
       aria-label="Calculator"
     >
@@ -287,7 +237,11 @@ const CalculatorIcon: React.FC<CalculatorIconProps> = ({
         height="30"
         viewBox="-2 -2 102 100"
         xmlns="http://www.w3.org/2000/svg"
-        className="text-white"
+        className="text-white will-change-transform"
+        style={{
+          touchAction: "none",
+          userSelect: "none"
+        }}
       >
         <circle
           ref={circleRef}

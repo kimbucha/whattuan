@@ -4,8 +4,7 @@ import ActivityChart from "@/components/ActivityChart";
 import { createBreathingAnimation } from "@/utils/animationUtils";
 import { ActivityData } from "@/types/activity";
 import { fetchGitHubContributions } from "@/utils/githubApi";
-import { Draggable } from "gsap/Draggable";
-import { Physics2D } from "gsap/Physics2D";
+import { useDraggable } from "@/hooks/useDraggable";
 
 interface GitHubIconProps {
   isVisible: boolean;
@@ -13,9 +12,6 @@ interface GitHubIconProps {
   onChartClose?: () => void;
   username: string;
 }
-
-// Register plugins
-gsap.registerPlugin(Draggable, Physics2D);
 
 const GitHubIcon: React.FC<GitHubIconProps> = ({ 
   isVisible, 
@@ -33,6 +29,9 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
   const pathRef = useRef<SVGPathElement>(null);
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<gsap.Context>();
+
+  // Apply draggable functionality
+  useDraggable(containerRef);
 
   // Cleanup GSAP animations on unmount
   useEffect(() => {
@@ -83,53 +82,6 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
       }
     };
   }, [isVisible]);
-
-  // Setup draggable and physics
-  useEffect(() => {
-    if (containerRef.current) {
-      // Create draggable instance
-      Draggable.create(containerRef.current, {
-        type: "x,y",
-        inertia: true,
-        bounds: window,
-        onDragStart: function() {
-          gsap.to(this.target, {
-            scale: 1.1,
-            duration: 0.2
-          });
-        },
-        onDragEnd: function() {
-          gsap.to(this.target, {
-            scale: 1,
-            duration: 0.2
-          });
-          
-          // Add floating animation
-          gsap.to(this.target, {
-            y: "+=20",
-            duration: 2,
-            ease: "power1.inOut",
-            yoyo: true,
-            repeat: -1
-          });
-        }
-      });
-
-      // Add initial floating animation
-      gsap.to(containerRef.current, {
-        y: "+=20",
-        duration: 2,
-        ease: "power1.inOut",
-        yoyo: true,
-        repeat: -1
-      });
-    }
-
-    return () => {
-      // Cleanup draggable instance
-      Draggable.get(containerRef.current)?.kill();
-    };
-  }, []);
 
   const closeChart = useCallback(() => {
     if (chartContainerRef.current) {
@@ -209,13 +161,14 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
   return (
     <div 
       ref={containerRef}
-      className="absolute w-8 h-8 flex items-center justify-center cursor-move"
+      className={`absolute w-8 h-8 flex items-center justify-center cursor-move ${!isVisible ? 'pointer-events-none' : ''}`}
       style={{
         touchAction: "none", // Prevent touch scrolling while dragging
+        visibility: isVisible ? 'visible' : 'hidden',
       }}
       onClick={handleIconClick}
       onKeyDown={handleKeyPress}
-      tabIndex={0}
+      tabIndex={isVisible ? 0 : -1}
       role="button"
       aria-label="GitHub activity"
     >

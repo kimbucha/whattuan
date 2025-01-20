@@ -14,6 +14,7 @@ export default function Home() {
   const githubIconRef = useRef<HTMLDivElement>(null);
   const calculatorIconRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout>();
+  const hasAnimatedRef = useRef(false);
   
   const [isImageIconVisible, setIsImageIconVisible] = useState(false);
   const [isGithubIconVisible, setIsGithubIconVisible] = useState(false);
@@ -29,18 +30,16 @@ export default function Home() {
   const [isCalculatorIconHovered, setIsCalculatorIconHovered] = useState(false);
 
   useEffect(() => {
-    // Initial setup - position icons at their starting points
+    // Initial setup - position icons at their starting points and ensure they're hidden
     gsap.set([imageIconRef.current, githubIconRef.current, calculatorIconRef.current], {
       opacity: 0,
       scale: 0.8,
       xPercent: -50,
-      yPercent: -50
+      yPercent: -50,
+      visibility: 'hidden',
+      x: 0,
+      y: 0
     });
-
-    // Set initial positions
-    gsap.set(imageIconRef.current, { x: 0, y: 100 });
-    gsap.set(githubIconRef.current, { x: -100, y: -100 });
-    gsap.set(calculatorIconRef.current, { x: 100, y: -100 });
 
     return () => {
       if (timeoutRef.current) {
@@ -50,26 +49,61 @@ export default function Home() {
   }, []);
 
   const handleMouseEnter = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
+    // If icons are already visible and animated, don't animate again
+    if (hasAnimatedRef.current && (isImageIconVisible || isGithubIconVisible || isCalculatorIconVisible)) {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      return;
     }
+
+    hasAnimatedRef.current = true;
 
     // Create a timeline for synchronized animations
     const tl = gsap.timeline({
       onStart: () => {
+        // First make them visible
+        gsap.set([imageIconRef.current, githubIconRef.current, calculatorIconRef.current], {
+          visibility: 'visible'
+        });
         setIsImageIconVisible(true);
         setIsGithubIconVisible(true);
         setIsCalculatorIconVisible(true);
       }
     });
 
-    // Fade in all icons
-    tl.to([imageIconRef.current, githubIconRef.current, calculatorIconRef.current], {
-      opacity: 1,
-      scale: 1,
+    // Animate icons dispersing from the center
+    tl.fromTo([imageIconRef.current, githubIconRef.current, calculatorIconRef.current],
+      {
+        opacity: 0,
+        scale: 0.8,
+        x: 0,
+        y: 0
+      },
+      {
+        opacity: 1,
+        scale: 1,
+        duration: 0.4,
+        ease: "power2.out",
+      }
+    )
+    .to(imageIconRef.current, {
+      y: 100,
       duration: 0.4,
-      ease: "power2.out",
-    });
+      ease: "back.out(1.7)"
+    }, "-=0.4")
+    .to(githubIconRef.current, {
+      x: -100,
+      y: -100,
+      duration: 0.4,
+      ease: "back.out(1.7)"
+    }, "-=0.4")
+    .to(calculatorIconRef.current, {
+      x: 100,
+      y: -100,
+      duration: 0.4,
+      ease: "back.out(1.7)"
+    }, "-=0.4");
   };
 
   const hideIcons = () => {
@@ -92,23 +126,25 @@ export default function Home() {
         setIsImageIconVisible(false);
         setIsGithubIconVisible(false);
         setIsCalculatorIconVisible(false);
+        hasAnimatedRef.current = false;
+        // Hide them completely after animation
+        gsap.set([imageIconRef.current, githubIconRef.current, calculatorIconRef.current], {
+          visibility: 'hidden',
+          x: 0,
+          y: 0
+        });
       }
     });
 
-    // First move icons back to starting positions
+    // Animate icons gathering back to center while fading out
     tl.to([imageIconRef.current, githubIconRef.current, calculatorIconRef.current], {
-      x: 0,
-      y: 0,
-      duration: 0.4,
-      ease: "power2.inOut",
-    }, 0)
-    // Then fade them out
-    .to([imageIconRef.current, githubIconRef.current, calculatorIconRef.current], {
       opacity: 0,
       scale: 0.8,
+      x: 0,
+      y: 0,
       duration: 0.3,
-      ease: "power2.inOut",
-    }, "-=0.2");
+      ease: "back.in(1.7)"
+    });
   };
 
   const startHideTimeout = () => {
