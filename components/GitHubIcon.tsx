@@ -79,6 +79,25 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
     };
   }, [isVisible]);
 
+  const closeChart = useCallback(() => {
+    if (chartContainerRef.current) {
+      gsap.to(chartContainerRef.current, {
+        opacity: 0,
+        scale: 0.95,
+        y: 20,
+        duration: 0.2,
+        ease: "power2.in",
+        onComplete: () => {
+          setShowChart(false);
+          onChartClose?.();
+        }
+      });
+    } else {
+      setShowChart(false);
+      onChartClose?.();
+    }
+  }, [onChartClose]);
+
   // Handle icon click
   const handleClick = useCallback(async (e?: React.MouseEvent | React.KeyboardEvent) => {
     if (e) {
@@ -120,25 +139,6 @@ const GitHubIcon: React.FC<GitHubIconProps> = ({
       closeChart();
     }
   }, [showChart, onChartOpen, fetchContributions, closeChart]);
-
-  const closeChart = useCallback(() => {
-    if (chartContainerRef.current) {
-      gsap.to(chartContainerRef.current, {
-        opacity: 0,
-        scale: 0.95,
-        y: 20,
-        duration: 0.2,
-        ease: "power2.in",
-        onComplete: () => {
-          setShowChart(false);
-          onChartClose?.();
-        }
-      });
-    } else {
-      setShowChart(false);
-      onChartClose?.();
-    }
-  }, [onChartClose]);
 
   const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
