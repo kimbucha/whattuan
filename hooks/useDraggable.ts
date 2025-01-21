@@ -53,12 +53,17 @@ export const useDraggable = (
     // Clear any existing GSAP tweens on the target
     gsap.killTweensOf(target);
     
+    // Get current Y position or start at a random phase
+    const currentY = gsap.getProperty(target, "y") as number;
+    const randomPhase = Math.random() * 15; // Random starting point in the 15px range
+    
     floatingAnimationRef.current = gsap.to(target, {
-      y: "+=15",
+      y: `+=${15}`,
       duration: 1.5,
       ease: "sine.inOut",
       yoyo: true,
-      repeat: -1
+      repeat: -1,
+      startAt: { y: currentY || randomPhase } // Use current position or random phase
     });
   };
 
@@ -98,15 +103,47 @@ export const useDraggable = (
     // Clear any existing animations
     cleanupAnimations(element);
 
+    // Calculate bounds based on the shared container
+    const updateBounds = () => {
+      // Find the shared container (the fixed inset-0 div)
+      const container = element.closest('.fixed.inset-0');
+      if (!container) {
+        console.warn('No shared container found for draggable element');
+        return null;
+      }
+
+      const containerRect = container.getBoundingClientRect();
+      const elementRect = element.getBoundingClientRect();
+      const padding = 20; // Add some padding from edges
+
+      return {
+        left: padding,
+        top: padding,
+        width: containerRect.width - (padding * 2),
+        height: containerRect.height - (padding * 2)
+      };
+    };
+
+    // Create draggable with bounds
     draggableInstanceRef.current = Draggable.create(element, {
       type: "x,y",
       inertia: true,
       dragResistance,
       throwResistance,
       maxDuration,
+      bounds: updateBounds() || undefined,
       onPress: function() {
         console.log('Icon pressed');
         cleanupAnimations(this.target);
+        
+        // Update bounds on press to handle window resize
+        const newBounds = updateBounds();
+        if (newBounds) {
+          this.applyBounds(newBounds);
+        }
+
+        // Bring to front
+        gsap.set(this.target, { zIndex: 100 });
       },
       onDragStart: function() {
         console.log('Drag started');
@@ -142,33 +179,6 @@ export const useDraggable = (
           overwrite: true
         });
       },
-      onThrowUpdate: function() {
-        const currentTime = Date.now();
-        const deltaTime = Math.max((currentTime - physicsRef.current.lastTime) / 1000, 0.001);
-        
-        physicsRef.current.velocityX *= friction;
-        physicsRef.current.velocityY *= friction;
-        physicsRef.current.velocityY += gravity * deltaTime;
-        
-        this.x += physicsRef.current.velocityX * deltaTime;
-        this.y += physicsRef.current.velocityY * deltaTime;
-        
-        const { rotation, normalizedSpeed } = calculateTransform(
-          physicsRef.current.velocityX,
-          physicsRef.current.velocityY
-        );
-        
-        gsap.to(this.target, {
-          rotation,
-          scaleX: 1 + normalizedSpeed * 0.3,
-          scaleY: 2 - (1 + normalizedSpeed * 0.3),
-          duration: 0.1,
-          ease: "none",
-          overwrite: true
-        });
-        
-        updatePhysics(this.x, this.y, currentTime);
-      },
       onDragEnd: function() {
         console.log('Drag ended');
         const speed = Math.sqrt(
@@ -194,6 +204,7 @@ export const useDraggable = (
           onComplete: () => {
             if (this.target) {
               startFloatingAnimation(this.target);
+              gsap.set(this.target, { zIndex: 50 }); // Reset z-index
             }
           }
         });
@@ -204,9 +215,22 @@ export const useDraggable = (
       }
     })[0];
 
+    // Add window resize handler to update bounds
+    const handleResize = () => {
+      if (draggableInstanceRef.current) {
+        const newBounds = updateBounds();
+        if (newBounds) {
+          draggableInstanceRef.current.applyBounds(newBounds);
+        }
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
     startFloatingAnimation(element);
 
     return () => {
+      window.removeEventListener('resize', handleResize);
       if (draggableInstanceRef.current) {
         draggableInstanceRef.current.kill();
         draggableInstanceRef.current = null;
