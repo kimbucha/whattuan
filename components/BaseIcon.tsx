@@ -82,7 +82,7 @@ export const BaseIcon: React.FC<BaseIconProps> = ({
         alignItems: "center",
         justifyContent: "center",
         willChange: "transform",
-        cursor: "pointer",
+        cursor: "none",
         background: "rgba(0, 0, 0, 0.1)",
         backdropFilter: "blur(2px)",
         transform: `scale(${bubbleState.isVisible ? 1 : 0.8})`,
@@ -95,7 +95,9 @@ export const BaseIcon: React.FC<BaseIconProps> = ({
       onDragEnd={onDragEnd}
       {...props}
     >
-      {children}
+      <div style={{ width: "56px", height: "56px" }}>
+        {children}
+      </div>
     </div>
   );
 }; 

@@ -124,7 +124,7 @@ function HomeContent() {
         <div className="relative w-screen h-screen flex items-center justify-center cursor-none">
           <div className="relative w-full max-w-4xl h-full max-h-screen flex items-center justify-center cursor-none">
             {/* Container for what text and bubbles */}
-            <div className="relative w-48 h-48 flex items-center justify-center">
+            <div className="relative w-48 h-48 flex items-center justify-center cursor-none">
               <FloatingText
                 ref={whatRef}
                 text="what"
@@ -134,7 +134,7 @@ function HomeContent() {
               />
 
               {/* Bubble container */}
-              <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute inset-0 pointer-events-none cursor-none">
                 {bubbleConfigs.map((config, index) => {
                   const Component = config.component;
                   const angle = (index * (2 * Math.PI / bubbleConfigs.length)) - (Math.PI / 2);

@@ -14,8 +14,8 @@ const ImageIcon: React.FC<ImageIconProps> = ({ id, ...props }) => {
     <BaseIcon id={id} {...props}>
       <svg
         ref={iconRef}
-        width="30"
-        height="30"
+        width="56"
+        height="56"
         viewBox="-2 -2 102 100"
         xmlns="http://www.w3.org/2000/svg"
         className="text-white"
