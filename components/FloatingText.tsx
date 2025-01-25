@@ -1,14 +1,15 @@
+import React from 'react';
 import { useEffect, useRef, forwardRef } from 'react';
 import { createFloatingAnimation } from '@/utils/animations';
 
 interface FloatingTextProps {
   text: string;
   className?: string;
-  onMouseEnter?: () => void;
-  onMouseLeave?: () => void;
+  onMouseEnter?: (e: React.MouseEvent) => void;
+  onMouseLeave?: (e: React.MouseEvent) => void;
 }
 
-const FloatingText = forwardRef<HTMLDivElement, FloatingTextProps>(({
+const FloatingText = React.forwardRef<HTMLDivElement, FloatingTextProps>(({
   text,
   className = '',
   onMouseEnter,
@@ -36,9 +37,13 @@ const FloatingText = forwardRef<HTMLDivElement, FloatingTextProps>(({
   return (
     <div
       ref={ref}
-      className={`inline-block ${className}`}
+      className={`block relative ${className}`}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      style={{
+        width: 'fit-content',
+        margin: '0 auto'
+      }}
     >
       {text.split('').map((letter, index) => (
         <span
@@ -47,7 +52,7 @@ const FloatingText = forwardRef<HTMLDivElement, FloatingTextProps>(({
             letterRefs.current[index] = el;
             return undefined;
           }}
-          className="inline-block"
+          className="inline-block relative"
           style={{ willChange: 'transform' }}
         >
           {letter}

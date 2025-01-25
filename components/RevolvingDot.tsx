@@ -1,5 +1,11 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
+
+// Register the plugin
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(MotionPathPlugin);
+}
 
 interface RevolvingDotProps {
   isActive?: boolean;
@@ -25,7 +31,7 @@ export default function RevolvingDot({
       animationRef.current.kill();
     }
 
-    if (isActive || isDragging) {
+    if (isActive && !isDragging) {
       // Create revolving animation
       animationRef.current = gsap.timeline({
         repeat: -1,
@@ -33,18 +39,29 @@ export default function RevolvingDot({
           ease: 'none',
           duration
         }
-      })
-      .set(dotRef.current, {
-        opacity: 1,
-        scale: isDragging ? 1.2 : 1
-      })
-      .to(dotRef.current, {
-        motionPath: {
-          path: `M ${radius} 0 A ${radius} ${radius} 0 1 1 ${-radius} 0 A ${radius} ${radius} 0 1 1 ${radius} 0`,
-          autoRotate: false,
-          alignOrigin: [0.5, 0.5]
-        }
       });
+
+      // Set initial position and create the circular motion
+      animationRef.current
+        .set(dotRef.current, {
+          opacity: 1,
+          scale: 1,
+          transformOrigin: '50% 50%'
+        })
+        .to(dotRef.current, {
+          motionPath: {
+            path: [
+              { x: radius, y: 0 },
+              { x: 0, y: radius },
+              { x: -radius, y: 0 },
+              { x: 0, y: -radius },
+              { x: radius, y: 0 }
+            ],
+            curviness: 1,
+            type: "cubic",
+            autoRotate: false
+          }
+        });
     } else {
       // Fade out when inactive
       gsap.to(dotRef.current, {
@@ -62,9 +79,16 @@ export default function RevolvingDot({
   }, [isActive, isDragging, radius, duration]);
 
   return (
-    <div
-      ref={dotRef}
-      className="pointer-events-none absolute left-1/2 top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white opacity-0 mix-blend-difference"
-    />
+    <div className="absolute inset-0 pointer-events-none">
+      <div
+        ref={dotRef}
+        className="absolute h-1 w-1 rounded-full bg-white opacity-0 mix-blend-difference"
+        style={{
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, -50%)'
+        }}
+      />
+    </div>
   );
 } 

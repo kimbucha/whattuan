@@ -60,42 +60,55 @@ export const useAnimation = ({
   const createFloatingAnimation = useCallback(() => {
     if (!elementRef.current || !centerRef?.current || isDraggingRef.current) return null;
 
-    const containerRect = centerRef.current.parentElement?.getBoundingClientRect();
-    if (!containerRect) return null;
+    const element = elementRef.current;
+    
+    // Create unique but consistent random values based on index
+    const seed = index + 1;
+    const baseFrequency = 2 + (seed % 2); // Base floating duration
+    const phaseOffset = seed * Math.PI / 4; // Offset for natural looking movement
+    
+    // Get current position as base
+    const currentX = gsap.getProperty(element, "x") as number;
+    const currentY = gsap.getProperty(element, "y") as number;
 
-    const scale = containerRect.width / 300; // Scale based on container size
-    const baseRange = 2; // Small base range
-    const floatRange = baseRange * scale;
-
-    const tl = gsap.timeline({
+    // Create floating animation with irregular movement
+    const tl = gsap.timeline({ 
       repeat: -1,
-      yoyo: true,
-      defaults: { ease: 'sine.inOut' }
+      defaults: { ease: "none" }
     });
 
-    // Get the current position as base
-    const currentX = gsap.getProperty(elementRef.current, "x") as number;
-    const currentY = gsap.getProperty(elementRef.current, "y") as number;
-
-    // Add random offset for natural movement
-    const randomOffset = Math.random() * Math.PI * 2;
-    const duration = 3 + Math.random() * 0.5; // 3-3.5s duration
-
-    // Create a more complex floating pattern
-    tl.to(elementRef.current, {
-      x: (time) => {
-        const progress = time % duration / duration;
-        return currentX + Math.sin(progress * Math.PI * 2 + randomOffset) * floatRange * 0.5;
-      },
-      y: (time) => {
-        const progress = time % duration / duration;
-        return currentY + Math.cos(progress * Math.PI * 2 + randomOffset) * floatRange * 0.5;
-      },
-      duration
+    // Add multiple overlapping sine waves for more natural movement
+    const duration = 3 + Math.random(); // Random duration between 3-4s
+    
+    // Main floating animation
+    tl.to(element, {
+      duration,
+      x: currentX,
+      y: currentY,
+      rotation: "+=5", // Add constant rotation
+      modifiers: {
+        x: () => {
+          const time = tl.time();
+          // Combine multiple sine waves with different frequencies
+          const wave1 = Math.sin(time * 1.5 + phaseOffset) * 4;
+          const wave2 = Math.sin(time * 0.7 + phaseOffset * 1.3) * 2;
+          return currentX + wave1 + wave2;
+        },
+        y: () => {
+          const time = tl.time();
+          // Combine multiple sine waves with different frequencies
+          const wave1 = Math.cos(time * 1.2 + phaseOffset) * 4;
+          const wave2 = Math.cos(time * 0.9 + phaseOffset * 1.7) * 2;
+          return currentY + wave1 + wave2;
+        }
+      }
     });
+
+    // Start playing immediately
+    tl.play();
 
     return tl;
-  }, [elementRef, centerRef]);
+  }, [elementRef, centerRef, index, isDraggingRef]);
 
   // Initialize position and floating animation
   useEffect(() => {
@@ -109,11 +122,16 @@ export const useAnimation = ({
       x: pos.x,
       y: pos.y,
       opacity: isVisible ? 1 : 0,
+      scale: isVisible ? 1 : 0.8,
+      rotation: 0, // Reset rotation
       duration: 0.6,
       ease: 'power2.out',
       onComplete: () => {
         // Only start floating animation after reaching initial position
-        if (!floatingRef.current && !isDraggingRef.current) {
+        if (!isDraggingRef.current) {
+          if (floatingRef.current) {
+            floatingRef.current.kill();
+          }
           const floatingAnim = createFloatingAnimation();
           if (floatingAnim) {
             floatingRef.current = floatingAnim;
@@ -165,7 +183,7 @@ export const useAnimation = ({
     isHoveredRef.current = isEntering;
 
     gsap.to(elementRef.current, {
-      scale: isEntering ? 1.1 : 1,
+      scale: isEntering ? 1.3 : 1,
       duration: 0.3,
       ease: 'power2.out'
     });

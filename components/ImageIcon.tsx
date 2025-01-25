@@ -1,57 +1,17 @@
-import { useRef, useCallback } from "react";
-import { createClickAnimation } from "@/utils/animations";
-import { useIconAnimation } from "@/hooks/useIconAnimation";
+import { useRef } from "react";
+import { BaseIconProps } from "@/types/icons";
+import { BaseIcon } from "./BaseIcon";
 
-interface ImageIconProps {
-  isVisible: boolean;
+export interface ImageIconProps extends BaseIconProps {
   onClick?: () => void;
-  index: number;
-  total: number;
-  centerRef: React.RefObject<HTMLElement>;
+  id: string;
 }
 
-const ImageIcon: React.FC<ImageIconProps> = ({
-  isVisible,
-  onClick,
-  index,
-  total,
-  centerRef
-}) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+const ImageIcon: React.FC<ImageIconProps> = ({ id, ...props }) => {
   const iconRef = useRef<SVGSVGElement>(null);
 
-  // Apply animations
-  useIconAnimation({
-    elementRef: containerRef,
-    centerRef,
-    index,
-    total,
-    isVisible
-  });
-
-  // Handle icon click with animation
-  const handleClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (iconRef.current) {
-      createClickAnimation(iconRef.current).eventCallback("onComplete", () => onClick?.());
-    } else {
-      onClick?.();
-    }
-  }, [onClick]);
-
   return (
-    <div 
-      ref={containerRef}
-      className={`absolute w-8 h-8 flex items-center justify-center cursor-move ${!isVisible ? 'pointer-events-none' : ''}`}
-      style={{
-        touchAction: "none", // Prevent touch scrolling while dragging
-        visibility: isVisible ? 'visible' : 'hidden',
-        zIndex: 50 // Ensure it's above other elements when dragging
-      }}
-      onClick={handleClick}
-      role="button"
-      aria-label="Image gallery"
-    >
+    <BaseIcon id={id} {...props}>
       <svg
         ref={iconRef}
         width="30"
@@ -59,16 +19,8 @@ const ImageIcon: React.FC<ImageIconProps> = ({
         viewBox="-2 -2 102 100"
         xmlns="http://www.w3.org/2000/svg"
         className="text-white"
-        style={{ pointerEvents: 'none' }} // Prevent SVG from interfering with drag
+        style={{ pointerEvents: 'none' }}
       >
-        <circle
-          cx="49"
-          cy="48"
-          r="46"
-          stroke="currentColor"
-          strokeWidth="4"
-          fill="none"
-        />
         <path
           fillRule="evenodd"
           clipRule="evenodd"
@@ -76,7 +28,7 @@ const ImageIcon: React.FC<ImageIconProps> = ({
           fill="currentColor"
         />
       </svg>
-    </div>
+    </BaseIcon>
   );
 };
 

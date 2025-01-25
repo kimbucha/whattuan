@@ -137,12 +137,15 @@ function HomeContent() {
               <div className="absolute inset-0 pointer-events-none">
                 {bubbleConfigs.map((config, index) => {
                   const Component = config.component;
+                  const angle = (index * (2 * Math.PI / bubbleConfigs.length)) - (Math.PI / 2);
+                  const radius = 100; // Distance from center
+                  const x = Math.cos(angle) * radius;
+                  const y = Math.sin(angle) * radius;
+
                   const componentProps = {
                     ...config.props,
                     id: config.id,
                     index,
-                    total: bubbleConfigs.length,
-                    centerRef: whatRef,
                     onDragStart: handleDragStart,
                     onDragEnd: handleDragEnd
                   };
@@ -157,7 +160,12 @@ function HomeContent() {
                         width: '32px',
                         height: '32px',
                         touchAction: 'none',
-                        userSelect: 'none'
+                        userSelect: 'none',
+                        transform: `translate(${x}px, ${y}px)`,
+                        left: '50%',
+                        top: '50%',
+                        marginLeft: '-16px',
+                        marginTop: '-16px'
                       }}
                     >
                       <Component {...componentProps} />
